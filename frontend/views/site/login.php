@@ -20,21 +20,50 @@ $this->params['breadcrumbs'][] = $this->title;
 
     body {
         height: 100vh;
-        background-color: #000;
+        margin: 0;
         overflow: hidden;
+        position: relative;
+    }
+
+    /* 背景图片轮播 */
+    .background-slideshow {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        overflow: hidden;
+    }
+
+    .background-slideshow img {
+        position: absolute; /* 确保图片堆叠在一起 */
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        opacity: 0;
+        transition: opacity 1s ease-in-out; /* 平滑过渡 */
+        z-index: -1; /* 保证图片不遮挡内容 */
+    }
+
+    .background-slideshow img.active {
+        opacity: 1;
+        z-index: 0; /* 显示当前图片 */
     }
 
     .site-login {
         position: relative;
-        height: 100%;
         display: flex;
         justify-content: center;
         align-items: center;
         z-index: 2;
+        height: 100%;
     }
 
     .login-container {
-        background-color: rgba(255, 255, 255, 0.8);
+        background-color: rgba(255, 255, 255, 0.8); /* 半透明背景 */
         padding: 40px;
         border-radius: 10px;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
@@ -45,7 +74,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     .login-container h1 {
         font-size: 36px;
-        color: #fff;
+        color: #4e73df;
         margin-bottom: 20px;
     }
 
@@ -80,29 +109,6 @@ $this->params['breadcrumbs'][] = $this->title;
         color: #fff;
         font-size: 14px;
     }
-
-    /* 背景图片轮播 */
-    .background-slideshow {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: -1;
-        overflow: hidden;
-    }
-
-    .background-slideshow img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        opacity: 0;
-        transition: opacity 1s ease-in-out;
-    }
-
-    .background-slideshow img.active {
-        opacity: 1;
-    }
 </style>
 
 <div class="site-login">
@@ -132,15 +138,16 @@ $this->params['breadcrumbs'][] = $this->title;
 
         <?php ActiveForm::end(); ?>
     </div>
-
-    <!-- Background Image Slideshow -->
-    <div class="background-slideshow">
-        <img src="<?= Yii::getAlias('@web') ?>/assets/images/背景图片.jpg" class="active">
-        <img src="<?= Yii::getAlias('@web') ?>/images/背景图片.jpg">
-        <img src="<?= Yii::getAlias('@web') ?>/images/背景图片.jpg">
-    </div>
 </div>
 
+<!-- 背景图片轮播 -->
+<div class="background-slideshow">
+    <img src="<?= Yii::getAlias('@web') ?>/assets/images/背景图片1.jpg" class="active">
+    <img src="<?= Yii::getAlias('@web') ?>/assets/images/背景图片2.jpg">
+    <img src="<?= Yii::getAlias('@web') ?>/assets/images/背景图片3.jpg">
+</div>
+
+<!-- 图片轮播 JavaScript -->
 <script>
     // 图片轮播效果
     let currentImageIndex = 0;
@@ -148,14 +155,13 @@ $this->params['breadcrumbs'][] = $this->title;
     const totalImages = images.length;
 
     setInterval(() => {
-        // 移除当前图片的active类
+        // 移除当前图片的 active 类
         images[currentImageIndex].classList.remove('active');
 
         // 切换到下一个图片
         currentImageIndex = (currentImageIndex + 1) % totalImages;
 
-        // 为下一个图片添加active类
+        // 为下一个图片添加 active 类
         images[currentImageIndex].classList.add('active');
     }, 5000); // 每5秒切换一次图片
 </script>
-
