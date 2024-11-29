@@ -134,23 +134,31 @@ $this->title = 'WELECOME TO THE MOVIE FORUM';
 
     <div class="body-content">
         <div class="row">
+            <!-- 电影推荐部分 -->
             <div class="col-lg-4">
-                <h2>Heading</h2>
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-                <p><a class="btn btn-default" href="http://www.yiiframework.com/doc/">Yii Documentation &raquo;</a></p>
+                <h2>Movie Recommendation</h2>
+                <p>Discover the latest movies and explore a world of entertainment.</p>
+                <p></p><a class="btn btn-default" href="<?= \yii\helpers\Url::to(['site/recommended']) ?>">See Recommended Movies &raquo;</a></p>
+
             </div>
+
+            <!-- 热门电影部分 -->
             <div class="col-lg-4">
-                <h2>Heading</h2>
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-                <p><a class="btn btn-default" href="http://www.yiiframework.com/forum/">Yii Forum &raquo;</a></p>
+                <h2>Popular Movies</h2>
+                <p>Check out the most popular movies being discussed by our users.</p>
+                <p><a class="btn btn-default" href="<?= \yii\helpers\Url::to(['site/popular']) ?>">View Popular Movies &raquo;</a></p>
             </div>
+
+            <!-- 电影论坛部分 -->
             <div class="col-lg-4">
-                <h2>Heading</h2>
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-                <p><a class="btn btn-default" href="http://www.yiiframework.com/extensions/">Yii Extensions &raquo;</a></p>
+                <h2>Animate Movies</h2>
+                <p>Check out the animate movies being discussed by our users.</p>
+                <p><a class="btn btn-default" href="<?= \yii\helpers\Url::to(['site/forum']) ?>">Visit the Forum &raquo;</a></p>
             </div>
         </div>
     </div>
+
+
 </div>
 
 <!-- 背景图片轮播 -->

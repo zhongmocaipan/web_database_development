@@ -82,6 +82,26 @@ class SiteController extends Controller
         return $this->render('index');
     }
 
+    
+        // 推荐电影页面
+    public function actionRecommended()
+    {
+        Yii::info('Rendering recommended page', __METHOD__); // 添加日志
+        return $this->render('recommended');
+    }
+
+    // 热门电影页面
+    public function actionPopular()
+    {
+        return $this->render('popular');
+    }
+
+    // 电影论坛页面
+    public function actionForum()
+    {
+        return $this->render('forum');
+    }
+
     /**
      * Dashboard page for logged-in users.
      *

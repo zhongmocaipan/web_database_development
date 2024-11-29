@@ -13,5 +13,15 @@ return [
             'viewPath' => '@common/mail',
             'useFileTransport' => false,                         // 是否启用邮件发送
         ],
+        'urlManager' => [
+            'enablePrettyUrl' => true,
+            'showScriptName' => false,
+            'rules' => [
+                'site/anime-movies' => 'site/anime-movies',
+                'site/sci-fi-movies' => 'site/sci-fi-movies',
+                'site/popular-movies' => 'site/popular-movies',
+            ],
+        ],
+
     ],
 ];
