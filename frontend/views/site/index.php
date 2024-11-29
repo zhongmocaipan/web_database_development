@@ -4,7 +4,7 @@
 
 use yii\helpers\Html;
 
-$this->title = 'My Yii Application';
+$this->title = 'WELECOME TO THE MOVIE FORUM';
 ?>
 
 <style>
@@ -128,7 +128,7 @@ $this->title = 'My Yii Application';
 <div class="site-index">
     <div class="jumbotron">
         <h1><?= Html::encode($this->title) ?></h1>
-        <p class="lead">You have successfully created your Yii-powered application.</p>
+        <p class="lead">WELCOME TO THE MOVIE FORUM</p>
         <p><a class="btn btn-lg btn-success" href="http://www.yiiframework.com">Get started with Yii</a></p>
     </div>
 
