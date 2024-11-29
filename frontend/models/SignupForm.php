@@ -8,72 +8,47 @@ use common\models\User;
 /**
  * Signup form
  */
+namespace frontend\models;
+
+use Yii;
+use yii\base\Model;
+use common\models\User; // 引入 User 模型
+use yii\web\IdentityInterface;
+
 class SignupForm extends Model
 {
     public $username;
     public $email;
     public $password;
 
-
-    /**
-     * {@inheritdoc}
-     */
+    // 定义验证规则
     public function rules()
     {
         return [
-            ['username', 'trim'],
-            ['username', 'required'],
-            ['username', 'unique', 'targetClass' => '\common\models\User', 'message' => 'This username has already been taken.'],
-            ['username', 'string', 'min' => 2, 'max' => 255],
-
-            ['email', 'trim'],
-            ['email', 'required'],
+            [['username', 'email', 'password'], 'required'],
             ['email', 'email'],
-            ['email', 'string', 'max' => 255],
             ['email', 'unique', 'targetClass' => '\common\models\User', 'message' => 'This email address has already been taken.'],
-
-            ['password', 'required'],
+            ['username', 'unique', 'targetClass' => '\common\models\User', 'message' => 'This username has already been taken.'],
             ['password', 'string', 'min' => 6],
         ];
     }
 
-    /**
-     * Signs user up.
-     *
-     * @return bool whether the creating new account was successful and email was sent
-     */
+    // 注册用户
     public function signup()
     {
-        if (!$this->validate()) {
-            return null;
+        if ($this->validate()) {
+            $user = new User();
+            $user->username = $this->username;
+            $user->email = $this->email;
+            $user->password = Yii::$app->security->generatePasswordHash($this->password); // 密码哈希加密
+            $user->auth_key = Yii::$app->security->generateRandomString(); // 生成auth_key
+            $user->created_at = date('Y-m-d H:i:s', time()); // 当前时间转为DATETIME格式
+            $user->updated_at = date('Y-m-d H:i:s', time()); // 当前时间转为DATETIME格式
+
+
+            return $user->save() ? $user : null;
         }
-        
-        $user = new User();
-        $user->username = $this->username;
-        $user->email = $this->email;
-        $user->setPassword($this->password);
-        $user->generateAuthKey();
-        $user->generateEmailVerificationToken();
-        return $user->save() && $this->sendEmail($user);
 
-    }
-
-    /**
-     * Sends confirmation email to user
-     * @param User $user user model to with email should be send
-     * @return bool whether the email was sent
-     */
-    protected function sendEmail($user)
-    {
-        return Yii::$app
-            ->mailer
-            ->compose(
-                ['html' => 'emailVerify-html', 'text' => 'emailVerify-text'],
-                ['user' => $user]
-            )
-            ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name . ' robot'])
-            ->setTo($this->email)
-            ->setSubject('Account registration at ' . Yii::$app->name)
-            ->send();
+        return null;
     }
 }

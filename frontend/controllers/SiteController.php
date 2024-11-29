@@ -28,17 +28,22 @@ class SiteController extends Controller
         return [
             'access' => [
                 'class' => AccessControl::className(),
-                'only' => ['logout', 'signup'],
+                'only' => ['logout', 'signup', 'dashboard'],  // 添加dashboard的访问控制
                 'rules' => [
                     [
                         'actions' => ['signup'],
                         'allow' => true,
-                        'roles' => ['?'],
+                        'roles' => ['?'],  // 只允许未登录用户访问signup页面
                     ],
                     [
                         'actions' => ['logout'],
                         'allow' => true,
-                        'roles' => ['@'],
+                        'roles' => ['@'],  // 只有已登录用户可以访问logout
+                    ],
+                    [
+                        'actions' => ['dashboard'], // 只有登录用户可以访问dashboard
+                        'allow' => true,
+                        'roles' => ['@'], 
                     ],
                 ],
             ],
@@ -78,6 +83,16 @@ class SiteController extends Controller
     }
 
     /**
+     * Dashboard page for logged-in users.
+     *
+     * @return mixed
+     */
+    public function actionDashboard()
+    {
+        return $this->render('dashboard');  // 渲染dashboard视图
+    }
+
+    /**
      * Logs in a user.
      *
      * @return mixed
@@ -92,7 +107,7 @@ class SiteController extends Controller
         if ($model->load(Yii::$app->request->post()) && $model->login()) {
             return $this->goBack();
         } else {
-            $model->password = '';
+            $model->password = '';  // 清空密码字段，避免泄漏敏感信息
 
             return $this->render('login', [
                 'model' => $model,
@@ -142,9 +157,7 @@ class SiteController extends Controller
      */
     public function actionAbout()
     {
-
-       return $this->render('about');//渲染一个页面，页面叫做about
-
+        return $this->render('about');  // 渲染about页面
     }
 
     /**
@@ -159,7 +172,7 @@ class SiteController extends Controller
             Yii::$app->session->setFlash('success', 'Thank you for registration. Please check your inbox for verification email.');
             return $this->goHome();
         }
-
+    
         return $this->render('signup', [
             'model' => $model,
         ]);
