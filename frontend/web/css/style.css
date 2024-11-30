@@ -1,0 +1,20 @@
+/* 在style.css中添加或修改的样式 */
+.movie-box {
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.movie-box h3 {
+    color: #4e73df;
+}
+
+.movie-box p {
+    color: #333;
+}
+
+.movie-box strong {
+    color: #4e73df;
+}

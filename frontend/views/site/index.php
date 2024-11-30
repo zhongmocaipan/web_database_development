@@ -136,23 +136,23 @@ $this->title = 'WELECOME TO THE MOVIE FORUM';
         <div class="row">
             <!-- 电影推荐部分 -->
             <div class="col-lg-4">
-                <h2>Movie Recommendation</h2>
-                <p>Discover the latest movies and explore a world of entertainment.</p>
+                <h2>language classification</h2>
+                <p>you can find movie with language</p>
                 <p></p><a class="btn btn-default" href="<?= \yii\helpers\Url::to(['site/recommended']) ?>">See Recommended Movies &raquo;</a></p>
 
             </div>
 
             <!-- 热门电影部分 -->
             <div class="col-lg-4">
-                <h2>Popular Movies</h2>
-                <p>Check out the most popular movies being discussed by our users.</p>
+                <h2>type classification</h2>
+                <p>you can find movie with type</p>
                 <p><a class="btn btn-default" href="<?= \yii\helpers\Url::to(['site/popular']) ?>">View Popular Movies &raquo;</a></p>
             </div>
 
             <!-- 电影论坛部分 -->
             <div class="col-lg-4">
-                <h2>Animate Movies</h2>
-                <p>Check out the animate movies being discussed by our users.</p>
+                <h2>id classification</h2>
+                <p>you can find movie with id</p>
                 <p><a class="btn btn-default" href="<?= \yii\helpers\Url::to(['site/forum']) ?>">Visit the Forum &raquo;</a></p>
             </div>
         </div>

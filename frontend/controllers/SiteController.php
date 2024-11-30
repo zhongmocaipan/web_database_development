@@ -82,25 +82,60 @@ class SiteController extends Controller
         return $this->render('index');
     }
 
-    
-        // 推荐电影页面
+    /**
+     * 推荐电影页面
+     */
     public function actionRecommended()
     {
-        Yii::info('Rendering recommended page', __METHOD__); // 添加日志
-        return $this->render('recommended');
+        Yii::info('Rendering recommended movies page', __METHOD__); // 添加日志
+        return $this->render('recommended'); // 修改为推荐页面视图名称
     }
 
-    // 热门电影页面
+    /**
+     * 热门电影页面
+     */
     public function actionPopular()
     {
-        return $this->render('popular');
+        return $this->render('popular'); // 修改为热门电影页面视图名称
     }
 
-    // 电影论坛页面
+    /**
+     * 电影论坛页面
+     */
     public function actionForum()
     {
-        return $this->render('forum');
+        $csvFile = Yii::getAlias('@frontend/web/data/sample.csv');
+        $movies = [];
+        
+        if (($handle = fopen($csvFile, 'r')) !== false) {
+            // 读取 CSV 文件的表头
+            $headers = fgetcsv($handle);
+            
+            // 检查表头的列数
+            $headerCount = count($headers);
+            
+            // 读取每一行数据
+            while (($data = fgetcsv($handle)) !== false) {
+                // 检查当前行的数据列数是否与表头列数一致
+                if (count($data) === $headerCount) {
+                    // 将每一行数据作为关联数组，键名为 CSV 的表头
+                    $movies[] = array_combine($headers, $data);
+                } else {
+                    // 如果列数不一致，记录错误或跳过当前行
+                    Yii::warning("Skipping row with mismatched column count: " . implode(", ", $data));
+                }
+            }
+            
+            fclose($handle);
+        }
+    
+        // 将电影数据传递给视图
+        return $this->render('id', [
+            'movies' => $movies,
+        ]);
     }
+    
+    
 
     /**
      * Dashboard page for logged-in users.
@@ -192,7 +227,7 @@ class SiteController extends Controller
             Yii::$app->session->setFlash('success', 'Thank you for registration. Please check your inbox for verification email.');
             return $this->goHome();
         }
-    
+
         return $this->render('signup', [
             'model' => $model,
         ]);
@@ -209,7 +244,6 @@ class SiteController extends Controller
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
             if ($model->sendEmail()) {
                 Yii::$app->session->setFlash('success', 'Check your email for further instructions.');
-
                 return $this->goHome();
             } else {
                 Yii::$app->session->setFlash('error', 'Sorry, we are unable to reset password for the provided email address.');
@@ -238,7 +272,6 @@ class SiteController extends Controller
 
         if ($model->load(Yii::$app->request->post()) && $model->validate() && $model->resetPassword()) {
             Yii::$app->session->setFlash('success', 'New password saved.');
-
             return $this->goHome();
         }
 
@@ -248,7 +281,7 @@ class SiteController extends Controller
     }
 
     /**
-     * Verify email address
+     * Verify email address.
      *
      * @param string $token
      * @throws BadRequestHttpException
@@ -268,12 +301,12 @@ class SiteController extends Controller
             }
         }
 
-        Yii::$app->session->setFlash('error', 'Sorry, we are unable to verify your account with provided token.');
+        Yii::$app->session->setFlash('error', 'Sorry, we are unable to verify your account with the provided token.');
         return $this->goHome();
     }
 
     /**
-     * Resend verification email
+     * Resend verification email.
      *
      * @return mixed
      */
@@ -285,11 +318,11 @@ class SiteController extends Controller
                 Yii::$app->session->setFlash('success', 'Check your email for further instructions.');
                 return $this->goHome();
             }
-            Yii::$app->session->setFlash('error', 'Sorry, we are unable to resend verification email for the provided email address.');
+            Yii::$app->session->setFlash('error', 'Sorry, we are unable to resend the verification email for the provided email address.');
         }
 
         return $this->render('resendVerificationEmail', [
-            'model' => $model
+            'model' => $model,
         ]);
     }
 }
