@@ -87,17 +87,111 @@ class SiteController extends Controller
      */
     public function actionRecommended()
     {
-        Yii::info('Rendering recommended movies page', __METHOD__); // 添加日志
-        return $this->render('recommended'); // 修改为推荐页面视图名称
+        Yii::info('Rendering recommended movies page', __METHOD__);  // 添加日志
+    
+        // 假设推荐数据来源于 CSV 文件，以下是读取 CSV 文件并获取推荐电影的过程
+        $csvFile = Yii::getAlias('@frontend/web/data/sample.csv');
+        $movies = [];
+        
+        if (($handle = fopen($csvFile, 'r')) !== false) {
+            // 读取 CSV 文件的表头
+            $headers = fgetcsv($handle);
+        
+            // 检查表头的列数
+            $headerCount = count($headers);
+        
+            // 读取每一行数据
+            while (($data = fgetcsv($handle)) !== false) {
+                if (count($data) === $headerCount) {
+                    $movies[] = array_combine($headers, $data);
+                } else {
+                    Yii::warning("Skipping row with mismatched column count: " . implode(", ", $data));
+                }
+            }
+        
+            fclose($handle);
+        } else {
+            Yii::warning("CSV file could not be opened: " . $csvFile);
+        }
+    
+        // 按发行地区 (release_region) 对电影进行分类
+        $movieRegions = [];
+        foreach ($movies as $movie) {
+            $regions = explode(',', $movie['release_region']);  // 假设发行地区是以逗号分隔的字符串
+            foreach ($regions as $region) {
+                $region = trim($region);  // 去除空格
+                if (!isset($movieRegions[$region])) {
+                    $movieRegions[$region] = [];
+                }
+                $movieRegions[$region][] = $movie;
+            }
+        }
+        
+        // 输出调试信息，确认数据是否正确
+        Yii::info('Movie release regions: ' . print_r($movieRegions, true));
+    
+        // 获取所有发行地区的名称，用于下拉列表
+        $regionsList = array_keys($movieRegions);
+        
+        // 渲染推荐页面视图并传递分类后的电影数据和区域名称列表
+        return $this->render('recommended', [
+            'movieRegions' => $movieRegions,
+            'regionsList' => $regionsList,
+        ]);
     }
+    
 
     /**
      * 热门电影页面
      */
     public function actionPopular()
     {
-        return $this->render('popular'); // 修改为热门电影页面视图名称
+        $csvFile = Yii::getAlias('@frontend/web/data/sample.csv');
+        $movies = [];
+        
+        if (($handle = fopen($csvFile, 'r')) !== false) {
+            // 读取 CSV 文件的表头
+            $headers = fgetcsv($handle);
+        
+            // 检查表头的列数
+            $headerCount = count($headers);
+        
+            // 读取每一行数据
+            while (($data = fgetcsv($handle)) !== false) {
+                if (count($data) === $headerCount) {
+                    $movies[] = array_combine($headers, $data);
+                } else {
+                    Yii::warning("Skipping row with mismatched column count: " . implode(", ", $data));
+                }
+            }
+        
+            fclose($handle);
+        } else {
+            Yii::warning("CSV file could not be opened: " . $csvFile);
+        }
+        
+        // 按类型对电影进行分类
+        $movieTypes = [];
+        foreach ($movies as $movie) {
+            $types = explode(',', $movie['types']);  // 假设类型是以逗号分隔的字符串
+            foreach ($types as $type) {
+                $type = trim($type);  // 去除空格
+                if (!isset($movieTypes[$type])) {
+                    $movieTypes[$type] = [];
+                }
+                $movieTypes[$type][] = $movie;
+            }
+        }
+        
+        // 输出调试信息，确认数据是否正确
+        Yii::info('Movie types: ' . print_r($movieTypes, true));
+        
+        return $this->render('types', [
+            'movieTypes' => $movieTypes,
+        ]);
     }
+    
+    
 
     /**
      * 电影论坛页面
