@@ -1,20 +1,51 @@
-/* 在style.css中添加或修改的样式 */
+/* 修改电影卡片布局，使其更加密集 */
 .movie-box {
     background-color: rgba(255, 255, 255, 0.9);
-    padding: 20px;
+    padding: 10px;  /* 减小内边距，使得卡片内容更紧凑 */
     border-radius: 10px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    margin-bottom: 20px;
+    margin-bottom: 10px;  /* 减小下边距，卡片之间间隔更小 */
 }
 
 .movie-box h3 {
     color: #4e73df;
+    font-size: 1.1em;
+    margin-bottom: 10px;  /* 增加标题与内容的间距 */
 }
 
 .movie-box p {
     color: #333;
+    font-size: 0.9em;  /* 调整文字大小 */
 }
 
 .movie-box strong {
     color: #4e73df;
+}
+
+/* 页面布局 */
+.row {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;  /* 使用 gap 让卡片之间的间隔一致 */
+}
+
+.col-lg-4 {
+    flex: 1;
+    min-width: 250px;  /* 保证卡片最小宽度 */
+    max-width: 30%;  /* 每行最多 3 个卡片，保持卡片紧密 */
+    padding: 0 10px;  /* 增加列内边距，避免卡片接触边缘 */
+}
+
+/* 为小屏设备调整布局 */
+@media (max-width: 768px) {
+    .col-lg-4 {
+        max-width: 48%;  /* 小屏幕时每行 2 个卡片 */
+    }
+}
+
+@media (max-width: 480px) {
+    .col-lg-4 {
+        max-width: 100%;  /* 更小的屏幕，每行 1 个卡片 */
+    }
 }
