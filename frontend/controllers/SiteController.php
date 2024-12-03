@@ -14,6 +14,8 @@ use frontend\models\PasswordResetRequestForm;
 use frontend\models\ResetPasswordForm;
 use frontend\models\SignupForm;
 use frontend\models\ContactForm;
+use frontend\models\Comment;  // 导入 Comment 模型类
+
 
 /**
  * Site controller
@@ -137,6 +139,7 @@ class SiteController extends Controller
         return $this->render('recommended', [
             'movieRegions' => $movieRegions,
             'regionsList' => $regionsList,
+            'movies' => $movies,
         ]);
     }
     
@@ -188,6 +191,7 @@ class SiteController extends Controller
         
         return $this->render('types', [
             'movieTypes' => $movieTypes,
+            'movies' => $movies,
         ]);
     }
     
@@ -419,4 +423,93 @@ class SiteController extends Controller
             'model' => $model,
         ]);
     }
+
+
+        public function actionComment($douban_id)
+    {
+        // 获取电影信息
+        $movie = null;
+        $csvFile = Yii::getAlias('@frontend/web/data/sample.csv');
+        $movies = [];
+
+        if (($handle = fopen($csvFile, 'r')) !== false) {
+            $headers = fgetcsv($handle);
+            while (($data = fgetcsv($handle)) !== false) {
+                $movie = array_combine($headers, $data);
+                if ($movie['douban_id'] == $douban_id) {
+                    break;
+                }
+                $movies[] = $movie;
+            }
+            fclose($handle);
+        }
+
+        if (!$movie) {
+            throw new \yii\web\NotFoundHttpException('Movie not found.');
+        }
+
+        // 获取与该电影相关的评论
+        $comments = Comment::find()->where(['movie_id' => $movie['douban_id']])->all();
+
+        // 创建一个新的 Comment 模型用于表单
+        $commentModel = new Comment();
+
+        // 渲染评论页面，并传递电影信息
+        return $this->render('comment', [
+            'movie' => $movie,  // 传递电影的详细信息
+            'comments' => $comments,  // 评论数据
+            'commentModel' => $commentModel,  // 评论模型
+        ]);
+    }
+
+    public function actionAddComment()
+    {
+        
+        // 检查用户是否登录
+        if (Yii::$app->user->isGuest) {
+            Yii::$app->session->setFlash('error', 'You must be logged in to post a comment.');
+            return $this->redirect(['site/login']);  // 如果未登录，重定向到登录页面
+        }
+
+        $comment = new Comment();
+
+        // 加载表单数据到 Comment 模型
+        if ($comment->load(Yii::$app->request->post())) {
+            // 设置评论的创建时间（当前时间戳）
+            $comment->created_at = time();
+            
+            // 获取当前登录用户的 ID 和用户名
+            $comment->user_id = Yii::$app->user->id;  // 当前用户的 ID
+            
+            // 保存评论
+            if ($comment->save()) {
+                
+                if (Yii::$app->request->isAjax) {
+                    return $this->asJson(['success' => true]);
+                }
+                Yii::$app->session->setFlash('success', 'Comment added successfully.');
+
+            } else {
+                
+            
+                //Yii::error('Error saving comment: ' . json_encode($comment->errors), __METHOD__);
+                if (Yii::$app->request->isAjax) {
+                    return $this->asJson(['success' => false]);
+                }
+                Yii::$app->session->setFlash('error', 'Failed to add comment.');
+                
+            }
+
+            
+        }
+
+        // 重定向回电影评论页面
+        //return $this->redirect(['site/comment', 'douban_id' => $movie_id]);
+        // 如果表单未提交或加载失败，重新渲染页面
+        return $this->render('comment');
+    }
+
+
+
 }
+

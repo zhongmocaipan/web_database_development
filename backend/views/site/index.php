@@ -2,52 +2,111 @@
 
 /* @var $this yii\web\View */
 
-$this->title = 'My Yii Application';
+$this->title = 'Admin Dashboard';
 ?>
-<div class="site-index">
+<div class="admin-dashboard">
 
-    <div class="jumbotron">
-        <h1>Congratulations!</h1>
+    <!-- 顶部导航栏 -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">Admin Dashboard</a>
+   </nav>
 
-        <p class="lead">You have successfully created your Yii-powered application.</p>
-
-        <p><a class="btn btn-lg btn-success" href="http://www.yiiframework.com">Get started with Yii</a></p>
-    </div>
-
-    <div class="body-content">
-
+    <div class="container-fluid">
         <div class="row">
-            <div class="col-lg-4">
-                <h2>Heading</h2>
-
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et
-                    dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
-                    ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-                    fugiat nulla pariatur.</p>
-
-                <p><a class="btn btn-default" href="http://www.yiiframework.com/doc/">Yii Documentation &raquo;</a></p>
+            <!-- 侧边栏 -->
+            <div class="col-md-3 bg-light sidebar">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="<?= \yii\helpers\Url::to(['site/index']) ?>">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?= \yii\helpers\Url::to(['comment/index']) ?>">Comment Management</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?= \yii\helpers\Url::to(['post/likes']) ?>">Likes Management</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?= \yii\helpers\Url::to(['user/user-management']) ?>">User Management</a>
+                    </li>
+                </ul>
             </div>
-            <div class="col-lg-4">
-                <h2>Heading</h2>
 
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et
-                    dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
-                    ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-                    fugiat nulla pariatur.</p>
+            <!-- 主要内容区域 -->
+            <div class="col-md-9">
+                <div class="jumbotron">
+                    <h1 class="display-4">Welcome to the Admin Dashboard!</h1>
+                    <p class="lead">You can manage all the aspects of the website from here. Use the sidebar to navigate to different sections.</p>
+                </div>
 
-                <p><a class="btn btn-default" href="http://www.yiiframework.com/forum/">Yii Forum &raquo;</a></p>
-            </div>
-            <div class="col-lg-4">
-                <h2>Heading</h2>
+                <div class="row">
+                    <!-- 评论管理 -->
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-header">
+                                Comment Management
+                            </div>
+                            <div class="card-body">
+                                <p>Manage user comments on posts. Approve, edit, or delete comments as needed.</p>
+                                <a href="<?= \yii\helpers\Url::to(['comment/index']) ?>" class="btn btn-primary">Go to Comment Management</a>
+                            </div>
+                        </div>
+                    </div>
 
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et
-                    dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
-                    ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-                    fugiat nulla pariatur.</p>
+                    <!-- 点赞数管理 -->
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-header">
+                                Likes Management
+                            </div>
+                            <div class="card-body">
+                                <p>Manage the number of likes for each post. Reset, increase, or decrease likes as needed.</p>
+                                <a href="<?= \yii\helpers\Url::to(['post/likes']) ?>" class="btn btn-primary">Go to Likes Management</a>
+                            </div>
+                        </div>
+                    </div>
 
-                <p><a class="btn btn-default" href="http://www.yiiframework.com/extensions/">Yii Extensions &raquo;</a></p>
+                    <!-- 用户管理 -->
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-header">
+                                User Management
+                            </div>
+                            <div class="card-body">
+                                <p>Manage front-end users, including viewing profiles, disabling accounts, and more.</p>
+                                <a href="<?= \yii\helpers\Url::to(['user/user-management']) ?>" class="btn btn-primary">Go to User Management</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
-
     </div>
+
 </div>
+
+<style>
+    .admin-dashboard {
+        margin-top: 20px;
+    }
+
+    .sidebar {
+        padding-top: 20px;
+    }
+
+    .card {
+        margin-bottom: 20px;
+    }
+
+    .card-header {
+        font-size: 18px;
+    }
+
+    .jumbotron {
+        background-color: #f1f1f1;
+    }
+
+    .navbar {
+        margin-bottom: 20px;
+    }
+</style>
