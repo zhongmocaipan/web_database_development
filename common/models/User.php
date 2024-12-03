@@ -121,4 +121,10 @@ class User extends ActiveRecord implements IdentityInterface
         // 验证 authKey 是否匹配
         return $this->getAuthKey() === $authKey;
     }
+
+    public function getStatusLabel()
+    {
+        return $this->status == self::STATUS_ACTIVE ? 'Active' : 'Inactive';
+    }
+
 }

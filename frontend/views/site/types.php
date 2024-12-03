@@ -42,9 +42,14 @@ $this->registerCss('
         top: 0;
         left: 0;
         width: 100%;
-        background-color: rgba(0, 0, 0, 0.8);
+        background-color: rgb(178 230 193 / 79%);
         z-index: 1000;
         padding: 10px 0;
+        opacity: 0; /* 初始透明，导航栏不可见 */
+        transition: opacity 0.3s ease-in-out; /* 平滑过渡 */
+    }
+    .movie-types-nav.show {
+        opacity: 1; /* 鼠标悬停时显示导航栏 */
     }
     .movie-types-nav ul {
         list-style-type: none;
@@ -57,17 +62,38 @@ $this->registerCss('
         margin: 0 10px;
     }
     .movie-types-nav ul li a {
-        color: #fff;
+        color: #000;  /* 初始字体颜色为黑色 */
         text-decoration: none;
         padding: 10px 20px;
-        background-color: #007bff;
+        background-color: transparent; /* 背景透明 */
         border-radius: 5px;
+        transition: color 0.3s ease, background-color 0.3s ease; /* 平滑过渡 */
     }
     .movie-types-nav ul li a:hover {
-        background-color: #0056b3;
+        color: #ff0000;  /* 鼠标悬停时字体颜色为红色 */
+        background-color: rgba(255, 0, 0, 0.1); /* 可选：鼠标悬停时添加淡红色背景 */
     }
     .row {
         margin-top: 60px; /* 给固定导航条留出空间 */
     }
 ');
 ?>
+
+<script>
+    const nav = document.querySelector('.movie-types-nav');
+
+    // 当鼠标进入导航栏区域时，显示导航栏
+    nav.addEventListener('mouseenter', function() {
+        nav.classList.add('show');
+    });
+
+    // 当鼠标离开导航栏区域时，隐藏导航栏
+    nav.addEventListener('mouseleave', function() {
+        nav.classList.remove('show');
+    });
+
+    // 当鼠标离开整个页面时，隐藏导航栏
+    window.addEventListener('mouseleave', function() {
+        nav.classList.remove('show');
+    });
+</script>

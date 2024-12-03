@@ -66,16 +66,39 @@ $this->registerCss('
         top: 0;
         left: 0;
         width: 100%;
-        background-color: rgba(0, 0, 0, 0.8);
+        background-color: rgb(0 0 0 / 0%);
         z-index: 1000;
         padding: 10px 0;
     }
     .movie-regions-nav form {
         margin: 0;
         padding: 0 20px;
+        position: relative; 
+        top: 20px; /* 上下偏移 */
+        left: 0px; /* 左右偏移 */
     }
     .movie-regions-nav select {
         width: 200px;
+        background-color: #f0f0f0; /* 设置下拉框的背景颜色 */
+        border: 1px solid #ccc; /* 可以自定义边框颜色 */
+        padding: 5px; /* 添加内边距，使下拉框内容不紧挨边缘 */
+        border-radius: 5px; /* 边角圆润 */
+        z-index: 1001; /* 设置下拉框的 z-index，确保它在导航栏上方 */
+    }
+    .movie-regions-nav select {
+        width: 200px;
+        background-color: #f0f0f0; /* 设置下拉框的背景颜色 */
+        border: 1px solid #ccc; /* 可以自定义边框颜色 */
+        padding: 5px; /* 添加内边距，使下拉框内容不紧挨边缘 */
+        border-radius: 5px; /* 边角圆润 */
+        height: 30px; /* 设置下拉框的高度 */
+        line-height: 30px; /* 设置文本的垂直对齐，避免文本显得偏高或偏低 */
+        z-index: 1001; /* 设置下拉框的 z-index，确保它在导航栏上方 */
+    }
+        
+    .movie-regions-nav select:focus {
+        background-color: #e6e6e6; /* 设置获得焦点时的背景颜色 */
+        border-color: #007bff; /* 设置聚焦时的边框颜色 */
     }
     .row {
         margin-top: 60px; /* 给固定导航条留出空间 */

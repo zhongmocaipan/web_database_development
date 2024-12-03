@@ -3,7 +3,7 @@
     background-color: rgba(255, 255, 255, 0.9);
     padding: 10px;  /* 减小内边距，使得卡片内容更紧凑 */
     border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px rgba(233, 159, 159, 0.1);
     margin-bottom: 10px;  /* 减小下边距，卡片之间间隔更小 */
 }
 
