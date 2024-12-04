@@ -1,6 +1,6 @@
 <?php
 namespace frontend\controllers;
-
+use yii\db\Query;
 use frontend\models\ResendVerificationEmailForm;
 use frontend\models\VerifyEmailForm;
 use Yii;
@@ -202,37 +202,17 @@ class SiteController extends Controller
      */
     public function actionForum()
     {
-        $csvFile = Yii::getAlias('@frontend/web/data/sample.csv');
-        $movies = [];
-        
-        if (($handle = fopen($csvFile, 'r')) !== false) {
-            // 读取 CSV 文件的表头
-            $headers = fgetcsv($handle);
-            
-            // 检查表头的列数
-            $headerCount = count($headers);
-            
-            // 读取每一行数据
-            while (($data = fgetcsv($handle)) !== false) {
-                // 检查当前行的数据列数是否与表头列数一致
-                if (count($data) === $headerCount) {
-                    // 将每一行数据作为关联数组，键名为 CSV 的表头
-                    $movies[] = array_combine($headers, $data);
-                } else {
-                    // 如果列数不一致，记录错误或跳过当前行
-                    Yii::warning("Skipping row with mismatched column count: " . implode(", ", $data));
-                }
-            }
-            
-            fclose($handle);
-        }
-    
-        // 将电影数据传递给视图
+        // 使用 Query 查询数据库中的数据
+        $tools = (new Query())
+            ->select('*') // 查询所有字段
+            ->from('all_ai_tool') // 表名
+            ->all(); // 获取所有数据
+
+        // 将数据传递给视图
         return $this->render('id', [
-            'movies' => $movies,
+            'tools' => $tools,  // 将查询到的数据传递给视图
         ]);
     }
-    
     
 
     /**
@@ -509,6 +489,16 @@ class SiteController extends Controller
         return $this->render('comment');
     }
 
+    public function actionGetCountryData()
+    {
+        $year = Yii::$app->request->get('year');
+        if ($year) {
+            $command = Yii::$app->db->createCommand('SELECT * FROM country_rank WHERE year = :year');
+            $data = $command->bindValue(':year', $year)->queryAll();
+            return json_encode($data);
+        }
+        return json_encode([]);
+    }
 
 
 }
