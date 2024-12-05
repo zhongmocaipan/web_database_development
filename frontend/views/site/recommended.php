@@ -27,6 +27,10 @@ $this->registerCssFile('@web/css/style.css');  // 引入样式文件
                     <p><strong>Published Date:</strong> <?= Html::encode($paper['published']) ?></p>
                     <p><strong>Authors:</strong> <?= Html::encode($paper['authors']) ?></p>
                     <p><strong>URL:</strong> <a href="<?= Html::encode($paper['url']) ?>" target="_blank"><?= Html::encode($paper['url']) ?></a></p>
+                    <p>
+                        <a class="btn btn-default" href="<?= Url::to(['site/comment', 'paper_id' => $paper['id']]) ?>">Comments & Like</a>
+                    </p>
+                
                 </div>
             </div>
         <?php endforeach; ?>

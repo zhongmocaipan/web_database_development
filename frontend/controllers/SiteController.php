@@ -15,6 +15,7 @@ use frontend\models\ResetPasswordForm;
 use frontend\models\SignupForm;
 use frontend\models\ContactForm;
 use frontend\models\Comment;  // 导入 Comment 模型类
+use frontend\models\ToolComment; 
 
 
 /**
@@ -405,8 +406,32 @@ class SiteController extends Controller
     }
 
 
-        public function actionComment($douban_id)
+    public function actionComment($paper_id)
     {
+        // 从数据库获取论文信息
+        $paper = Yii::$app->db->createCommand('SELECT * FROM arxiv_papers WHERE id = :id')
+        ->bindValue(':id', $paper_id)
+        ->queryOne();
+
+        if (!$paper) {
+            throw new \yii\web\NotFoundHttpException('Paper not found.');
+        }
+
+        // 使用 Comment 模型获取与该论文相关的评论
+        $comments = Comment::find()->where(['paper_id' => $paper_id])->all();
+
+        // 创建一个新的 Comment 模型用于表单
+        $commentModel = new Comment();
+
+        // 渲染评论页面，并传递论文和评论数据
+        return $this->render('comment', [
+            'paper' => $paper,         // 传递论文详细信息
+            'comments' => $comments,  // 评论数据
+            'commentModel' => $commentModel,  // 评论模型
+        ]);
+
+
+        /*
         // 获取电影信息
         $movie = null;
         $csvFile = Yii::getAlias('@frontend/web/data/sample.csv');
@@ -440,6 +465,7 @@ class SiteController extends Controller
             'comments' => $comments,  // 评论数据
             'commentModel' => $commentModel,  // 评论模型
         ]);
+        */
     }
 
     public function actionAddComment()
@@ -455,6 +481,18 @@ class SiteController extends Controller
 
         // 加载表单数据到 Comment 模型
         if ($comment->load(Yii::$app->request->post())) {
+
+            // 检查 paper_id 是否有效
+            $paper = Yii::$app->db->createCommand('SELECT * FROM arxiv_papers WHERE id = :id')
+            ->bindValue(':id', $comment->paper_id)
+            ->queryOne();
+
+            if (!$paper) {
+                Yii::$app->session->setFlash('error', 'Invalid paper ID.');
+                return $this->redirect(['site/comment', 'paper_id' => $comment->paper_id]);
+            }
+
+            
             // 设置评论的创建时间（当前时间戳）
             $comment->created_at = time();
             
@@ -500,6 +538,66 @@ class SiteController extends Controller
         return json_encode([]);
     }
 
+
+    public function actionToolcomment($tool_name)
+    {
+        // 获取工具详情
+        $tool = Yii::$app->db->createCommand('SELECT * FROM all_ai_tool WHERE `AI Tool Name` = :tool_name')
+        ->bindValue(':tool_name', $tool_name)
+        ->queryOne();
+
+        if (!$tool) {
+            throw new \yii\web\NotFoundHttpException('Tool not found.');
+        }
+
+        // 获取与该工具相关的评论
+        $comments = ToolComment::find()->where(['tool_name' => $tool_name])->all();
+
+        // 创建一个新的评论模型用于表单
+        $commentModel = new ToolComment();
+
+        return $this->render('toolcomment', [
+            'tool' => $tool,
+            'comments' => $comments,
+            'commentModel' => $commentModel,
+        ]);
+    }
+
+    public function actionAddToolComment()
+    {
+        if (Yii::$app->user->isGuest) {
+            Yii::$app->session->setFlash('error', 'You must be logged in to post a comment.');
+            return $this->redirect(['site/login']);
+        }
+
+        $comment = new ToolComment();
+
+        if ($comment->load(Yii::$app->request->post())) {
+            $comment->user_id = Yii::$app->user->id;
+            $comment->created_at = time();
+
+            // 保存评论
+            if ($comment->save()) {
+                
+                if (Yii::$app->request->isAjax) {
+                    return $this->asJson(['success' => true]);
+                }
+                Yii::$app->session->setFlash('success', 'Comment added successfully.');
+
+            } else {
+                
+            
+                //Yii::error('Error saving comment: ' . json_encode($comment->errors), __METHOD__);
+                if (Yii::$app->request->isAjax) {
+                    return $this->asJson(['success' => false]);
+                }
+                Yii::$app->session->setFlash('error', 'Failed to add comment.');
+                
+            }
+        }
+
+        return $this->render('toolcomment');
+    }
 
 }
 

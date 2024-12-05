@@ -7,27 +7,34 @@ $this->registerJsFile("https://code.jquery.com/ui/1.12.1/jquery-ui.min.js", ['de
 
 ?>
 
-<h1><?= Html::encode($movie['title']) ?></h1>
-<p><strong>Directors:</strong> <?= Html::encode($movie['directors']) ?></p>
-<p><strong>Actors:</strong> <?= Html::encode($movie['actors']) ?></p>
-<p><strong>Release Region:</strong> <?= Html::encode($movie['release_region']) ?></p>
-<p><strong>Score:</strong> <?= Html::encode($movie['score']) ?></p>
-<p><strong>Description:</strong> <?= Html::encode($movie['description']) ?></p>
+<h1>Paper Details</h1>
+<!-- 展示论文详情 -->
+<p><strong>Title:</strong> <?= Html::encode($paper['title']) ?></p>
+<p><strong>Abstract:</strong> <?= Html::encode($paper['abstract']) ?></p>
+<p><strong>Published:</strong> <?= Html::encode($paper['published']) ?></p>
+<p><strong>Authors:</strong> <?= Html::encode($paper['authors']) ?></p>
+<p><strong>URL:</strong> <a href="<?= Html::encode($paper['url']) ?>" target="_blank"><?= Html::encode($paper['url']) ?></a></p>
+
+<hr>
 
 <h2>Comments</h2>
-<ul>
-    <?php if (!empty($comments)): ?>
-        <?php foreach ($comments as $comment): ?>
-            <li><strong><?= Html::encode($comment->user->username) ?>:</strong> <?= Html::encode($comment->content) ?></li>
-        <?php endforeach; ?>
-    <?php else: ?>
-        <li>No comments yet.</li> <!-- 如果没有评论，显示提示信息 -->
-    <?php endif; ?>
-</ul>
+<!-- 评论区 -->
+<?php if (!empty($comments)): ?>
+    <?php foreach ($comments as $comment): ?>
+        <div class="comment-box">
+            <p><strong>User:</strong> <?= Html::encode($comment->user->username) ?></p>
+            <p><strong>Comment:</strong> <?= Html::encode($comment->content) ?></p>
+            <p><strong>Posted at:</strong> <?= date('Y-m-d H:i:s', $comment->created_at) ?></p>
+        </div>
+        <hr>
+    <?php endforeach; ?>
+<?php else: ?>
+    <p>No comments yet.</p>
+<?php endif; ?>
 
+<hr>
 
-<h3>Leave a Comment</h3>
-
+<h2>Post a Comment</h2>
 <?php $form = ActiveForm::begin([
     'id' => 'comment-form',
     'action' => ['site/add-comment'],
@@ -35,16 +42,21 @@ $this->registerJsFile("https://code.jquery.com/ui/1.12.1/jquery-ui.min.js", ['de
     'options' => ['data-pjax' => 1, 'class' => 'form-horizontal'], // 启用 PJAX
 ]); ?>
 
-<!-- 隐藏电影ID，确保评论与电影关联 -->
-<?= Html::hiddenInput('Comment[movie_id]', $movie['douban_id']) ?>
+<!-- 隐藏论文 ID，确保评论与论文关联 -->
+<?= Html::hiddenInput('Comment[paper_id]', $paper['id']) ?>
 
-<?= $form->field($commentModel, 'content')->textarea(['rows' => 4, 'placeholder' => 'Write your comment here...']) ?>
+<?= $form->field($commentModel, 'content')->textarea([
+    'rows' => 4,
+    'placeholder' => 'Write your comment here...'
+])->label(false) ?>
 
 <div class="form-group">
     <?= Html::submitButton('Post Comment', ['class' => 'btn btn-primary', 'id' => 'submit-button']) ?>
 </div>
 
 <?php ActiveForm::end(); ?>
+
+
 
 <!-- 弹窗反馈 -->
 <div id="successDialog" title="Success" style="display:none;">
