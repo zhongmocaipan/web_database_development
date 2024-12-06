@@ -55,6 +55,22 @@ $this->registerCssFile('@web/css/style.css'); // 可选，用于加载外部 CSS
 <?php
 // 注册样式
 $this->registerCss('
+ body {
+        background-image: url("' . Yii::getAlias('@web/images/background.jpg') . '");
+        background-size: cover; /* 背景图像覆盖整个页面 */
+        background-attachment: fixed; /* 背景固定不滚动 */
+        background-position: center; /* 背景居中 */
+        background-repeat: no-repeat; /* 不重复背景图片 */
+        color: #333; /* 字体颜色，确保在背景上清晰可见 */
+    }
+    /* 修改标题样式 */
+    h1 {
+        font-size: 48px; /* 增加字号 */
+        color: #f0f0f0; /* 设置浅色字体 */
+        font-weight: bold; /* 加粗字体 */
+        text-align: center; /* 居中对齐标题 */
+        margin-top: 30px; /* 顶部留白 */
+    }
     .search-bar {
         margin-bottom: 20px;
         text-align: center;

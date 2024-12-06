@@ -65,14 +65,23 @@ $this->registerCssFile('@web/css/style.css');  // 引入样式文件
 
 <?php
 // 添加样式来调整页面布局和背景图片
+// 添加样式来调整页面布局和背景图片
 $this->registerCss('
     body {
-        background-image: url("@web/images/background.jpg");
+        background-image: url("' . Yii::getAlias('@web/images/background.jpg') . '");
         background-size: cover; /* 背景图像覆盖整个页面 */
         background-attachment: fixed; /* 背景固定不滚动 */
         background-position: center; /* 背景居中 */
         background-repeat: no-repeat; /* 不重复背景图片 */
         color: #333; /* 字体颜色，确保在背景上清晰可见 */
+    }
+    /* 修改标题样式 */
+    h1 {
+        font-size: 48px; /* 增加字号 */
+        color: #f0f0f0; /* 设置浅色字体 */
+        font-weight: bold; /* 加粗字体 */
+        text-align: center; /* 居中对齐标题 */
+        margin-top: 30px; /* 顶部留白 */
     }
     .search-bar {
         margin-bottom: 20px;
@@ -100,4 +109,6 @@ $this->registerCss('
         margin-top: 60px; /* 给固定导航条留出空间 */
     }
 ');
+
+
 ?>
