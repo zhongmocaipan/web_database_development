@@ -677,8 +677,88 @@ class SiteController extends Controller
         ]);
     }
     
+    public function actionLike()
+    {
+        if (Yii::$app->user->isGuest) {
+            Yii::$app->session->setFlash('error', 'You must be logged in to post a comment.');
+            return $this->redirect(['site/login']);
+        }
+        
+        $userId = Yii::$app->user->id;  // 获取当前用户 ID
+        $toolName = Yii::$app->request->post('tool_name');  // 获取工具名称
 
+        if (!$userId || !$toolName) {
+            return $this->asJson(['success' => false, 'message' => 'User ID or Tool Name is missing.']);
+        }
 
+        
+
+        try {
+            // 插入点赞记录到数据库
+            Yii::$app->db->createCommand()->insert('tool_likes', [
+                'user_id' => $userId,
+                'tool_name' => $toolName,
+                'created_at' => time(),  // 当前时间
+            ])->execute();
+
+            // 获取更新后的点赞数
+            $likesCount = Yii::$app->db->createCommand('SELECT COUNT(*) FROM tool_likes WHERE tool_name = :tool_name', [':tool_name' => $toolName])->queryScalar();
+
+            // 返回点赞数
+            return $this->asJson([
+                'success' => true,
+                'likes_count' => $likesCount,  // 返回更新后的点赞数
+            ]);
+        } catch (\Exception $e) {
+            return $this->asJson(['success' => false, 'message' => 'You have liked this tool!']);
+        }
+    }
+
+    public function actionLikePaper()
+    {
+        
+
+        if (Yii::$app->user->isGuest) {
+            Yii::$app->session->setFlash('error', 'You must be logged in to post a comment.');
+            return $this->redirect(['site/login']);
+        }
+
+        $userId = Yii::$app->user->id;  // 获取当前用户 ID
+        $paperId = Yii::$app->request->post('paper_id');  // 获取论文 ID
+
+        // 检查用户ID和论文ID是否有效
+        if (!$userId || !$paperId) {
+            return $this->asJson(['success' => false, 'message' => 'User ID or Paper ID is missing.']);
+        }
+
+        try {
+            // 插入点赞记录到数据库
+            Yii::$app->db->createCommand()->insert('paper_likes', [
+                'user_id' => $userId,
+                'paper_id' => $paperId,
+                'created_at' => new \yii\db\Expression('NOW()'),  // 当前时间
+            ])->execute();
+            
+            Yii::info("Inserted like record for Paper ID: $paperId, User ID: $userId", __METHOD__);
+
+            // 获取更新后的点赞数
+            $likesCount = Yii::$app->db->createCommand('SELECT COUNT(*) FROM paper_likes WHERE paper_id = :paper_id', [':paper_id' => $paperId])->queryScalar();
+
+            Yii::info("Likes count for Paper ID: $paperId updated to: $likesCount", __METHOD__);
+
+            // 获取更新后的点赞数
+            //$likesCount = Yii::$app->db->createCommand('SELECT COUNT(*) FROM paper_likes WHERE paper_id = :paper_id', [':paper_id' => $paperId])->queryScalar();
+
+            // 返回点赞数
+            return $this->asJson([
+                'success' => true,
+                'likes_count' => $likesCount,  // 返回更新后的点赞数
+            ]);
+        } catch (\Exception $e) {
+            Yii::error("Error occurred while liking paper $paperId: " . $e->getMessage(), __METHOD__);
+            return $this->asJson(['success' => false, 'message' => 'You have liked this paper!']);
+        }
+    }
 
 }
 

@@ -125,6 +125,8 @@ $this->title = 'World Artificial Intelligence Ranking 1996-2021';
     }
 </style>
 
+
+
 <div class="site-index">
     <div class="jumbotron">
         <h1><?= Html::encode($this->title) ?></h1>
