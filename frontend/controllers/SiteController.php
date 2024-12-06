@@ -598,6 +598,31 @@ class SiteController extends Controller
 
         return $this->render('toolcomment');
     }
+    // controllers/SiteController.php
+
+    public function actionArxiv()
+    {
+        // 获取数据库连接
+        $connection = Yii::$app->db;
+
+        // 获取用户输入的日期
+        $searchDate = Yii::$app->request->get('date', '');
+
+        // 根据日期查询 arxiv_papers 表
+        if ($searchDate) {
+            $arxivPapers = $connection->createCommand('SELECT * FROM arxiv_papers WHERE published = :date')
+                ->bindValue(':date', $searchDate)
+                ->queryAll();
+        } else {
+            $arxivPapers = $connection->createCommand('SELECT * FROM arxiv_papers')->queryAll();
+        }
+
+        // 渲染视图
+        return $this->render('arxiv', [
+            'arxivPapers' => $arxivPapers,
+            'searchDate' => $searchDate,
+        ]);
+    }
 
 }
 

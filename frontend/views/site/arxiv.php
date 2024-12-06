@@ -3,40 +3,29 @@ use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use yii\helpers\Url;
 
-// 连接数据库
-$connection = Yii::$app->db;
-
-// 获取用户输入的日期
-$searchDate = Yii::$app->request->get('date', '');
-
-// 根据日期查询 arxiv_papers 表
-if ($searchDate) {
-    $arxivPapers = $connection->createCommand('SELECT * FROM arxiv_papers WHERE published = :date')
-        ->bindValue(':date', $searchDate)
-        ->queryAll();
-} else {
-    $arxivPapers = $connection->createCommand('SELECT * FROM arxiv_papers')->queryAll();
-}
-
-$this->registerCssFile('@web/css/style.css');  // 引入样式文件
+// 注册 CSS 样式
+$this->registerCssFile('@web/css/style.css'); // 可选，用于加载外部 CSS 文件
 ?>
 
 <h1>Arxiv Papers</h1>
 
-<!-- 日期检索框 -->
+<!-- 日期检索表单 -->
 <div class="search-bar">
     <?php $form = ActiveForm::begin([
         'method' => 'get',
-        'action' => Url::to(['site/arxiv']),
+        'action' => Url::to(['site/arxiv']), // 指向当前路由
         'options' => ['class' => 'form-inline'],
     ]); ?>
-    <?= Html::input('date', 'date', $searchDate, ['class' => 'form-control', 'placeholder' => 'Select date']) ?>
-    <?= Html::submitButton('Search by Date', ['class' => 'btn btn-primary']) ?>
+    <?= Html::input('date', 'date', $searchDate, [
+        'class' => 'form-control',
+        'placeholder' => 'Search by date',
+    ]) ?>
+    <?= Html::submitButton('Search', ['class' => 'btn btn-primary']) ?>
     <?php ActiveForm::end(); ?>
 </div>
 
-<!-- 显示所有论文 -->
-<?php if ($arxivPapers): ?>
+<!-- 显示论文列表 -->
+<?php if (!empty($arxivPapers)): ?>
     <div class="row">
         <?php foreach ($arxivPapers as $paper): ?>
             <div class="col-lg-4">
@@ -60,20 +49,12 @@ $this->registerCssFile('@web/css/style.css');  // 引入样式文件
         <?php endforeach; ?>
     </div>
 <?php else: ?>
-    <p>No papers found for the selected date.</p>
+    <p>No papers available for the selected date.</p>
 <?php endif; ?>
 
 <?php
-// 添加样式来调整页面布局和背景图片
+// 注册样式
 $this->registerCss('
-    body {
-        background-image: url("@web/images/background.jpg");
-        background-size: cover; /* 背景图像覆盖整个页面 */
-        background-attachment: fixed; /* 背景固定不滚动 */
-        background-position: center; /* 背景居中 */
-        background-repeat: no-repeat; /* 不重复背景图片 */
-        color: #333; /* 字体颜色，确保在背景上清晰可见 */
-    }
     .search-bar {
         margin-bottom: 20px;
         text-align: center;
@@ -87,8 +68,8 @@ $this->registerCss('
         border: 1px solid #ddd;
         border-radius: 5px;
         margin-bottom: 20px;
-        background-color: rgba(255, 255, 255, 0.9); /* 设置半透明背景，提升可读性 */
-        min-height: 400px; /* 调整框的最小高度以适应所有内容 */
+        background-color: #f9f9f9;
+        min-height: 400px; /* 调整框的最小高度 */
         display: flex;
         flex-direction: column;
         justify-content: space-between;
@@ -97,7 +78,7 @@ $this->registerCss('
         margin: 5px 0;
     }
     .row {
-        margin-top: 60px; /* 给固定导航条留出空间 */
+        margin-top: 20px;
     }
 ');
 ?>
