@@ -527,17 +527,52 @@ class SiteController extends Controller
         return $this->render('comment');
     }
 
+    // public function actionGetCountryData()
+    // {
+    //     $year = Yii::$app->request->get('year');
+    //     if ($year) {
+    //         $command = Yii::$app->db->createCommand('SELECT * FROM country_rank WHERE year = :year');
+    //         $data = $command->bindValue(':year', $year)->queryAll();
+    //         return json_encode($data);
+    //     }
+    //     return json_encode([]);
+    // }
+    // public function actionGetCountryData()
+    // {
+    //     $year = Yii::$app->request->get('year');
+    //     $attribute = Yii::$app->request->get('attribute');
+    
+    //     if (!$year || !$attribute) {
+    //         return json_encode([]);
+    //     }
+    
+    //     $data = (new Query())
+    //         ->select(['region', 'documents', 'citable_documents', 'citations', 'self_citations', 'citations_per_document', 'h_index'])
+    //         ->from('country_rank')
+    //         ->where(['year' => $year])
+    //         ->all();
+    
+    //     // 将数据返回给前端
+    //     return json_encode($data);
+    // }
     public function actionGetCountryData()
     {
         $year = Yii::$app->request->get('year');
-        if ($year) {
-            $command = Yii::$app->db->createCommand('SELECT * FROM country_rank WHERE year = :year');
-            $data = $command->bindValue(':year', $year)->queryAll();
-            return json_encode($data);
+
+        if (!$year) {
+            return json_encode([]);
         }
-        return json_encode([]);
+
+        $data = (new Query())
+            ->select(['region', 'documents', 'citable_documents', 'citations', 'self_citations', 'citations_per_document', 'h_index'])
+            ->from('country_rank')
+            ->where(['year' => $year])
+            ->all();
+
+        return json_encode($data);
     }
 
+    
 
     public function actionToolcomment($tool_name)
     {
@@ -642,7 +677,8 @@ class SiteController extends Controller
         ]);
     }
     
-    
+
+
 
 }
 
