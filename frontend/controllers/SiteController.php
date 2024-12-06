@@ -623,6 +623,26 @@ class SiteController extends Controller
             'searchDate' => $searchDate,
         ]);
     }
+    public function actionAiTool()
+    {
+        // 获取选择的工具状态
+        $toolStatus = Yii::$app->request->get('tool_status');
+        
+        // 查询工具
+        $toolsQuery = Tool::find();  // 使用你实际的工具模型类
+        
+        if ($toolStatus) {
+            $toolsQuery->andWhere(['Free/Paid/Other' => $toolStatus]);
+        }
+    
+        $tools = $toolsQuery->all();
+    
+        return $this->render('ai_tool', [
+            'tools' => $tools,
+        ]);
+    }
+    
+    
 
 }
 

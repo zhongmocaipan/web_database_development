@@ -162,10 +162,11 @@ $this->title = 'World Artificial Intelligence Ranking 1996-2021';
 </div>
 
 <!-- 背景图片轮播 -->
+<!-- 背景图片轮播 -->
 <div class="background-slideshow">
-    <img src="<?= Yii::getAlias('@web') ?>/assets/images/背景图片1.jpg" class="active">
-    <img src="<?= Yii::getAlias('@web') ?>/assets/images/背景图片2.jpg">
-    <img src="<?= Yii::getAlias('@web') ?>/assets/images/背景图片3.jpg">
+    <img src="<?= Yii::getAlias('@web') ?>/images/背景图片1.jpg" class="active">
+    <img src="<?= Yii::getAlias('@web') ?>/images/背景图片2.jpg">
+    <img src="<?= Yii::getAlias('@web') ?>/images/背景图片3.jpg">
 </div>
 
 <!-- 图片轮播 JavaScript -->
