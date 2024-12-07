@@ -267,7 +267,7 @@ class SiteController extends Controller
      * @return mixed
      */
     public function actionContact()
-    {
+    {   /*
         $model = new ContactForm();
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
             if ($model->sendEmail(Yii::$app->params['adminEmail'])) {
@@ -281,7 +281,64 @@ class SiteController extends Controller
             return $this->render('contact', [
                 'model' => $model,
             ]);
+        }*/
+        // 只在表单提交时处理
+        // 只在表单提交时处理
+        if (Yii::$app->user->isGuest) {
+            Yii::$app->session->setFlash('error', 'You must be logged in to post a comment.');
+            return $this->redirect(['site/login']);
         }
+
+        if (Yii::$app->request->isPost) {
+            $name = Yii::$app->request->post('name');
+            $email = Yii::$app->request->post('email');
+            $subject = Yii::$app->request->post('subject');
+            $body = Yii::$app->request->post('body');
+    
+            // 打印日志查看是否接收到数据
+            Yii::info("Received data: name=$name, email=$email, subject=$subject, body=$body", 'contactForm');
+            $createdAt = date('Y-m-d H:i:s', time());
+            try {
+                // 生成 SQL 语句，记录日志
+                $sql = Yii::$app->db->createCommand()
+                    ->insert('contact_form_submissions', [
+                        'user_id' => Yii::$app->user->id,
+                        'name' => $name,
+                        'email' => $email,
+                        'subject' => $subject,
+                        'body' => $body,
+                        'created_at' => $createdAt,
+                    ])
+                    ->getSql();
+                
+                Yii::info("Generated SQL: " . $sql, 'contactForm');
+                
+                // 执行插入操作
+                Yii::$app->db->createCommand()
+                    ->insert('contact_form_submissions', [
+                        'user_id' => Yii::$app->user->isGuest ? null : Yii::$app->user->id,
+                        'name' => $name,
+                        'email' => $email,
+                        'subject' => $subject,
+                        'body' => $body,
+                        'created_at' => $createdAt,
+                    ])
+                    ->execute();
+                
+                // 返回成功响应
+                Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                return ['success' => true];
+            } catch (\Exception $e) {
+                // 捕获异常，记录详细错误信息
+                Yii::error("Database error: " . $e->getMessage(), 'contactForm');
+                Yii::error("Stack trace: " . $e->getTraceAsString(), 'contactForm');
+                
+                // 返回具体错误信息
+                Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                return ['success' => false, 'message' => 'An error occurred: ' . $e->getMessage()];
+            }
+        }
+        return $this->render('contact');
     }
 
     /**
@@ -759,6 +816,7 @@ class SiteController extends Controller
             return $this->asJson(['success' => false, 'message' => 'You have liked this paper!']);
         }
     }
+    
 
 }
 
