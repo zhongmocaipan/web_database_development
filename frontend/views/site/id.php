@@ -6,7 +6,7 @@ use yii\helpers\Url;
 $this->registerCssFile('@web/css/style.css');
 ?>
 
-<h1>Movie Details by Douban ID</h1>
+<h1>AI 工具列表</h1>
 
 <!-- 搜索框 -->
 <div class="search-form">

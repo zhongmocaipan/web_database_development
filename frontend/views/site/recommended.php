@@ -1,64 +1,108 @@
 <?php
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
-use yii\helpers\ArrayHelper;
+use yii\helpers\Url;
+
+// 连接数据库
+$connection = Yii::$app->db;
+
+// 获取用户输入的日期
+$searchDate = Yii::$app->request->get('date', '');
+
+// 根据日期查询 arxiv_papers 表
+if ($searchDate) {
+    $arxivPapers = $connection->createCommand('SELECT * FROM arxiv_papers WHERE published = :date')
+        ->bindValue(':date', $searchDate)
+        ->queryAll();
+} else {
+    $arxivPapers = $connection->createCommand('SELECT * FROM arxiv_papers')->queryAll();
+}
 
 $this->registerCssFile('@web/css/style.css');  // 引入样式文件
 ?>
 
-<h1>Recommended Movies by Release Region</h1>
+<h1>Arxiv Papers</h1>
 
-<!-- 固定头部下拉列表 -->
-<div class="movie-regions-nav">
-    <form method="get" action="">
-        <div class="form-group">
-            <label for="region-select">Select Release Region:</label>
-            <select id="region-select" name="region" class="form-control" onchange="this.form.submit()">
-                <option value="">-- Select a Region --</option>
-                <?php foreach ($regionsList as $region): ?>
-                    <option value="<?= Html::encode($region) ?>" <?= isset($_GET['region']) && $_GET['region'] == $region ? 'selected' : '' ?>>
-                        <?= Html::encode($region) ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
-        </div>
-    </form>
+<!-- 日期检索框 -->
+<div class="search-bar">
+    <?php $form = ActiveForm::begin([
+        'method' => 'get',
+        'action' => Url::to(['site/arxiv']),
+        'options' => ['class' => 'form-inline'],
+    ]); ?>
+    <?= Html::input('date', 'date', $searchDate, ['class' => 'form-control', 'placeholder' => 'Select date']) ?>
+    <?= Html::submitButton('Search by Date', ['class' => 'btn btn-primary']) ?>
+    <?php ActiveForm::end(); ?>
 </div>
 
-<?php
-// 根据选择的发行地区筛选电影
-$selectedRegion = isset($_GET['region']) ? $_GET['region'] : null;
-$filteredMovies = $selectedRegion ? $movieRegions[$selectedRegion] : [];
-
-if ($filteredMovies): ?>
+<!-- 显示所有论文 -->
+<?php if ($arxivPapers): ?>
     <div class="row">
-        <h2>Movies in <?= Html::encode($selectedRegion) ?> Region</h2>
-        <?php foreach ($filteredMovies as $movie): ?>
-            <div class="col-lg-3">
-                <div class="movie-box">
-                    <p><strong>Title:</strong> <?= Html::encode($movie['title']) ?></p>
-                    <p><strong>Directors:</strong> <?= Html::encode($movie['directors']) ?></p>
-                    <p><strong>Actors:</strong> <?= Html::encode($movie['actors']) ?></p>
-                    <p><strong>Release Region:</strong> <?= Html::encode($movie['release_region']) ?></p>
+        <?php foreach ($arxivPapers as $paper): ?>
+            <div class="col-lg-4">
+                <div class="paper-box">
+                    <p><strong>Title:</strong> <?= Html::encode($paper['title']) ?></p>
+                    <p><strong>Abstract:</strong> 
+                        <?php 
+                        $abstractWords = explode(' ', $paper['abstract']);
+                        $shortAbstract = implode(' ', array_slice($abstractWords, 0, 20)) . (count($abstractWords) > 20 ? '...' : '');
+                        echo Html::encode($shortAbstract); 
+                        ?>
+                    </p>
+                    <p><strong>Published Date:</strong> <?= Html::encode($paper['published']) ?></p>
+                    <p><strong>Authors:</strong> <?= Html::encode($paper['authors']) ?></p>
+                    <p><strong>URL:</strong> <a href="<?= Html::encode($paper['url']) ?>" target="_blank"><?= Html::encode($paper['url']) ?></a></p>
+                    <p>
+                        <a class="btn btn-default" href="<?= Url::to(['site/comment', 'paper_id' => $paper['id']]) ?>">Comments & Like</a>
+                    </p>
                 </div>
             </div>
         <?php endforeach; ?>
     </div>
 <?php else: ?>
-    <p>No movies available for the selected region.</p>
+    <p>No papers found for the selected date.</p>
 <?php endif; ?>
 
 <?php
-// 添加样式来调整电影推荐页面的布局
+// 添加样式来调整页面布局和背景图片
+// 添加样式来调整页面布局和背景图片
 $this->registerCss('
-    .movie-box {
+    body {
+        background-image: url("' . Yii::getAlias('@web/images/background.jpg') . '");
+        background-size: cover; /* 背景图像覆盖整个页面 */
+        background-attachment: fixed; /* 背景固定不滚动 */
+        background-position: center; /* 背景居中 */
+        background-repeat: no-repeat; /* 不重复背景图片 */
+        color: #333; /* 字体颜色，确保在背景上清晰可见 */
+    }
+    /* 修改标题样式 */
+    h1 {
+        font-size: 48px; /* 增加字号 */
+        color: #f0f0f0; /* 设置浅色字体 */
+        font-weight: bold; /* 加粗字体 */
+        text-align: center; /* 居中对齐标题 */
+        margin-top: 30px; /* 顶部留白 */
+    }
+    .search-bar {
+        margin-bottom: 20px;
+        text-align: center;
+    }
+    .search-bar .form-control {
+        width: 300px;
+        display: inline-block;
+    }
+    .paper-box {
         padding: 15px;
         border: 1px solid #ddd;
         border-radius: 5px;
         margin-bottom: 20px;
-        background-color: #f9f9f9;
+        background-color: rgba(255, 255, 255, 0.9); /* 设置半透明背景，提升可读性 */
+        min-height: 400px; /* 调整框的最小高度以适应所有内容 */
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
     }
-    .movie-box p {
+    .paper-box p {
         margin: 5px 0;
     }
     .movie-regions-nav {
@@ -104,4 +148,6 @@ $this->registerCss('
         margin-top: 60px; /* 给固定导航条留出空间 */
     }
 ');
+
+
 ?>

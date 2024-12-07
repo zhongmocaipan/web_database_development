@@ -20,10 +20,29 @@ $this->title = 'Admin Dashboard';
                         <a class="nav-link active" href="<?= \yii\helpers\Url::to(['site/index']) ?>">Dashboard</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="<?= \yii\helpers\Url::to(['comment/index']) ?>">Comment Management</a>
+                        <a class="nav-link" href="<?= \yii\helpers\Url::to(['comment/select-type']) ?>">Comment Management</a>
+                        <!-- 子菜单 -->
+                        <ul class="nav flex-column ml-3">
+                            <li class="nav-item">
+                                <a class="nav-link" href="<?= \yii\helpers\Url::to(['comment/ai-tool']) ?>">AI Tool Comments</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="<?= \yii\helpers\Url::to(['comment/paper']) ?>">Paper Comments</a>
+                            </li>
+                        </ul>
                     </li>
+
                     <li class="nav-item">
-                        <a class="nav-link" href="<?= \yii\helpers\Url::to(['post/likes']) ?>">Likes Management</a>
+                        <a class="nav-link" href="<?= \yii\helpers\Url::to(['post/select-type']) ?>">Likes Management</a>
+                        <!-- 子菜单 -->
+                        <ul class="nav flex-column ml-3">
+                            <li class="nav-item">
+                                <a class="nav-link" href="<?= \yii\helpers\Url::to(['post/ai-tool']) ?>">AI Tool Likes</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="<?= \yii\helpers\Url::to(['post/paper']) ?>">Paper Likes</a>
+                            </li>
+                        </ul>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="<?= \yii\helpers\Url::to(['user/user-management']) ?>">User Management</a>
@@ -39,6 +58,7 @@ $this->title = 'Admin Dashboard';
                 </div>
 
                 <div class="row">
+
                     <!-- 评论管理 -->
                     <div class="col-md-4">
                         <div class="card">
@@ -46,8 +66,8 @@ $this->title = 'Admin Dashboard';
                                 Comment Management
                             </div>
                             <div class="card-body">
-                                <p>Manage user comments on posts. Approve, edit, or delete comments as needed.</p>
-                                <a href="<?= \yii\helpers\Url::to(['comment/index']) ?>" class="btn btn-primary">Go to Comment Management</a>
+                                <p>Select the type of comments you want to manage:</p>
+                                <a href="<?= \yii\helpers\Url::to(['comment/select-type']) ?>" class="btn btn-primary">Go to Comment Management</a>
                             </div>
                         </div>
                     </div>
@@ -60,7 +80,7 @@ $this->title = 'Admin Dashboard';
                             </div>
                             <div class="card-body">
                                 <p>Manage the number of likes for each post. Reset, increase, or decrease likes as needed.</p>
-                                <a href="<?= \yii\helpers\Url::to(['post/likes']) ?>" class="btn btn-primary">Go to Likes Management</a>
+                                <a href="<?= \yii\helpers\Url::to(['post/select-type']) ?>" class="btn btn-primary">Go to Likes Management</a>
                             </div>
                         </div>
                     </div>
@@ -108,5 +128,13 @@ $this->title = 'Admin Dashboard';
 
     .navbar {
         margin-bottom: 20px;
+    }
+
+    .nav-link.active {
+        font-weight: bold;
+    }
+
+    .nav.flex-column .nav-item .nav-link {
+        padding-left: 1.5rem;
     }
 </style>

@@ -1,6 +1,6 @@
 <?php
 namespace frontend\controllers;
-
+use yii\db\Query;
 use frontend\models\ResendVerificationEmailForm;
 use frontend\models\VerifyEmailForm;
 use Yii;
@@ -14,6 +14,9 @@ use frontend\models\PasswordResetRequestForm;
 use frontend\models\ResetPasswordForm;
 use frontend\models\SignupForm;
 use frontend\models\ContactForm;
+use frontend\models\Comment;  // 导入 Comment 模型类
+use frontend\models\ToolComment; 
+
 
 /**
  * Site controller
@@ -137,6 +140,7 @@ class SiteController extends Controller
         return $this->render('recommended', [
             'movieRegions' => $movieRegions,
             'regionsList' => $regionsList,
+            'movies' => $movies,
         ]);
     }
     
@@ -188,6 +192,7 @@ class SiteController extends Controller
         
         return $this->render('types', [
             'movieTypes' => $movieTypes,
+            'movies' => $movies,
         ]);
     }
     
@@ -198,37 +203,17 @@ class SiteController extends Controller
      */
     public function actionForum()
     {
-        $csvFile = Yii::getAlias('@frontend/web/data/sample.csv');
-        $movies = [];
-        
-        if (($handle = fopen($csvFile, 'r')) !== false) {
-            // 读取 CSV 文件的表头
-            $headers = fgetcsv($handle);
-            
-            // 检查表头的列数
-            $headerCount = count($headers);
-            
-            // 读取每一行数据
-            while (($data = fgetcsv($handle)) !== false) {
-                // 检查当前行的数据列数是否与表头列数一致
-                if (count($data) === $headerCount) {
-                    // 将每一行数据作为关联数组，键名为 CSV 的表头
-                    $movies[] = array_combine($headers, $data);
-                } else {
-                    // 如果列数不一致，记录错误或跳过当前行
-                    Yii::warning("Skipping row with mismatched column count: " . implode(", ", $data));
-                }
-            }
-            
-            fclose($handle);
-        }
-    
-        // 将电影数据传递给视图
+        // 使用 Query 查询数据库中的数据
+        $tools = (new Query())
+            ->select('*') // 查询所有字段
+            ->from('all_ai_tool') // 表名
+            ->all(); // 获取所有数据
+
+        // 将数据传递给视图
         return $this->render('id', [
-            'movies' => $movies,
+            'tools' => $tools,  // 将查询到的数据传递给视图
         ]);
     }
-    
     
 
     /**
@@ -419,4 +404,361 @@ class SiteController extends Controller
             'model' => $model,
         ]);
     }
+
+
+    public function actionComment($paper_id)
+    {
+        // 从数据库获取论文信息
+        $paper = Yii::$app->db->createCommand('SELECT * FROM arxiv_papers WHERE id = :id')
+        ->bindValue(':id', $paper_id)
+        ->queryOne();
+
+        if (!$paper) {
+            throw new \yii\web\NotFoundHttpException('Paper not found.');
+        }
+
+        // 使用 Comment 模型获取与该论文相关的评论
+        $comments = Comment::find()->where(['paper_id' => $paper_id])->all();
+
+        // 创建一个新的 Comment 模型用于表单
+        $commentModel = new Comment();
+
+        // 渲染评论页面，并传递论文和评论数据
+        return $this->render('comment', [
+            'paper' => $paper,         // 传递论文详细信息
+            'comments' => $comments,  // 评论数据
+            'commentModel' => $commentModel,  // 评论模型
+        ]);
+
+
+        /*
+        // 获取电影信息
+        $movie = null;
+        $csvFile = Yii::getAlias('@frontend/web/data/sample.csv');
+        $movies = [];
+
+        if (($handle = fopen($csvFile, 'r')) !== false) {
+            $headers = fgetcsv($handle);
+            while (($data = fgetcsv($handle)) !== false) {
+                $movie = array_combine($headers, $data);
+                if ($movie['douban_id'] == $douban_id) {
+                    break;
+                }
+                $movies[] = $movie;
+            }
+            fclose($handle);
+        }
+
+        if (!$movie) {
+            throw new \yii\web\NotFoundHttpException('Movie not found.');
+        }
+
+        // 获取与该电影相关的评论
+        $comments = Comment::find()->where(['movie_id' => $movie['douban_id']])->all();
+
+        // 创建一个新的 Comment 模型用于表单
+        $commentModel = new Comment();
+
+        // 渲染评论页面，并传递电影信息
+        return $this->render('comment', [
+            'movie' => $movie,  // 传递电影的详细信息
+            'comments' => $comments,  // 评论数据
+            'commentModel' => $commentModel,  // 评论模型
+        ]);
+        */
+    }
+
+    public function actionAddComment()
+    {
+        
+        // 检查用户是否登录
+        if (Yii::$app->user->isGuest) {
+            Yii::$app->session->setFlash('error', 'You must be logged in to post a comment.');
+            return $this->redirect(['site/login']);  // 如果未登录，重定向到登录页面
+        }
+
+        $comment = new Comment();
+
+        // 加载表单数据到 Comment 模型
+        if ($comment->load(Yii::$app->request->post())) {
+
+            // 检查 paper_id 是否有效
+            $paper = Yii::$app->db->createCommand('SELECT * FROM arxiv_papers WHERE id = :id')
+            ->bindValue(':id', $comment->paper_id)
+            ->queryOne();
+
+            if (!$paper) {
+                Yii::$app->session->setFlash('error', 'Invalid paper ID.');
+                return $this->redirect(['site/comment', 'paper_id' => $comment->paper_id]);
+            }
+
+            
+            // 设置评论的创建时间（当前时间戳）
+            $comment->created_at = time();
+            
+            // 获取当前登录用户的 ID 和用户名
+            $comment->user_id = Yii::$app->user->id;  // 当前用户的 ID
+            
+            // 保存评论
+            if ($comment->save()) {
+                
+                if (Yii::$app->request->isAjax) {
+                    return $this->asJson(['success' => true]);
+                }
+                Yii::$app->session->setFlash('success', 'Comment added successfully.');
+
+            } else {
+                
+            
+                //Yii::error('Error saving comment: ' . json_encode($comment->errors), __METHOD__);
+                if (Yii::$app->request->isAjax) {
+                    return $this->asJson(['success' => false]);
+                }
+                Yii::$app->session->setFlash('error', 'Failed to add comment.');
+                
+            }
+
+            
+        }
+
+        // 重定向回电影评论页面
+        //return $this->redirect(['site/comment', 'douban_id' => $movie_id]);
+        // 如果表单未提交或加载失败，重新渲染页面
+        return $this->render('comment');
+    }
+
+    // public function actionGetCountryData()
+    // {
+    //     $year = Yii::$app->request->get('year');
+    //     if ($year) {
+    //         $command = Yii::$app->db->createCommand('SELECT * FROM country_rank WHERE year = :year');
+    //         $data = $command->bindValue(':year', $year)->queryAll();
+    //         return json_encode($data);
+    //     }
+    //     return json_encode([]);
+    // }
+    // public function actionGetCountryData()
+    // {
+    //     $year = Yii::$app->request->get('year');
+    //     $attribute = Yii::$app->request->get('attribute');
+    
+    //     if (!$year || !$attribute) {
+    //         return json_encode([]);
+    //     }
+    
+    //     $data = (new Query())
+    //         ->select(['region', 'documents', 'citable_documents', 'citations', 'self_citations', 'citations_per_document', 'h_index'])
+    //         ->from('country_rank')
+    //         ->where(['year' => $year])
+    //         ->all();
+    
+    //     // 将数据返回给前端
+    //     return json_encode($data);
+    // }
+    public function actionGetCountryData()
+    {
+        $year = Yii::$app->request->get('year');
+
+        if (!$year) {
+            return json_encode([]);
+        }
+
+        $data = (new Query())
+            ->select(['region', 'documents', 'citable_documents', 'citations', 'self_citations', 'citations_per_document', 'h_index'])
+            ->from('country_rank')
+            ->where(['year' => $year])
+            ->all();
+
+        return json_encode($data);
+    }
+
+    
+
+    public function actionToolcomment($tool_name)
+    {
+        // 获取工具详情
+        $tool = Yii::$app->db->createCommand('SELECT * FROM all_ai_tool WHERE `AI Tool Name` = :tool_name')
+        ->bindValue(':tool_name', $tool_name)
+        ->queryOne();
+
+        if (!$tool) {
+            throw new \yii\web\NotFoundHttpException('Tool not found.');
+        }
+
+        // 获取与该工具相关的评论
+        $comments = ToolComment::find()->where(['tool_name' => $tool_name])->all();
+
+        // 创建一个新的评论模型用于表单
+        $commentModel = new ToolComment();
+
+        return $this->render('toolcomment', [
+            'tool' => $tool,
+            'comments' => $comments,
+            'commentModel' => $commentModel,
+        ]);
+    }
+
+    public function actionAddToolComment()
+    {
+        if (Yii::$app->user->isGuest) {
+            Yii::$app->session->setFlash('error', 'You must be logged in to post a comment.');
+            return $this->redirect(['site/login']);
+        }
+
+        $comment = new ToolComment();
+
+        if ($comment->load(Yii::$app->request->post())) {
+            $comment->user_id = Yii::$app->user->id;
+            $comment->created_at = time();
+
+            // 保存评论
+            if ($comment->save()) {
+                
+                if (Yii::$app->request->isAjax) {
+                    return $this->asJson(['success' => true]);
+                }
+                Yii::$app->session->setFlash('success', 'Comment added successfully.');
+
+            } else {
+                
+            
+                //Yii::error('Error saving comment: ' . json_encode($comment->errors), __METHOD__);
+                if (Yii::$app->request->isAjax) {
+                    return $this->asJson(['success' => false]);
+                }
+                Yii::$app->session->setFlash('error', 'Failed to add comment.');
+                
+            }
+        }
+
+        return $this->render('toolcomment');
+    }
+    // controllers/SiteController.php
+
+    public function actionArxiv()
+    {
+        // 获取数据库连接
+        $connection = Yii::$app->db;
+
+        // 获取用户输入的日期
+        $searchDate = Yii::$app->request->get('date', '');
+
+        // 根据日期查询 arxiv_papers 表
+        if ($searchDate) {
+            $arxivPapers = $connection->createCommand('SELECT * FROM arxiv_papers WHERE published = :date')
+                ->bindValue(':date', $searchDate)
+                ->queryAll();
+        } else {
+            $arxivPapers = $connection->createCommand('SELECT * FROM arxiv_papers')->queryAll();
+        }
+
+        // 渲染视图
+        return $this->render('arxiv', [
+            'arxivPapers' => $arxivPapers,
+            'searchDate' => $searchDate,
+        ]);
+    }
+    public function actionAiTool()
+    {
+        // 获取选择的工具状态
+        $toolStatus = Yii::$app->request->get('tool_status');
+        
+        // 查询工具
+        $toolsQuery = Tool::find();  // 使用你实际的工具模型类
+        
+        if ($toolStatus) {
+            $toolsQuery->andWhere(['Free/Paid/Other' => $toolStatus]);
+        }
+    
+        $tools = $toolsQuery->all();
+    
+        return $this->render('ai_tool', [
+            'tools' => $tools,
+        ]);
+    }
+    
+    public function actionLike()
+    {
+        if (Yii::$app->user->isGuest) {
+            Yii::$app->session->setFlash('error', 'You must be logged in to post a comment.');
+            return $this->redirect(['site/login']);
+        }
+        
+        $userId = Yii::$app->user->id;  // 获取当前用户 ID
+        $toolName = Yii::$app->request->post('tool_name');  // 获取工具名称
+
+        if (!$userId || !$toolName) {
+            return $this->asJson(['success' => false, 'message' => 'User ID or Tool Name is missing.']);
+        }
+
+        
+
+        try {
+            // 插入点赞记录到数据库
+            Yii::$app->db->createCommand()->insert('tool_likes', [
+                'user_id' => $userId,
+                'tool_name' => $toolName,
+                'created_at' => time(),  // 当前时间
+            ])->execute();
+
+            // 获取更新后的点赞数
+            $likesCount = Yii::$app->db->createCommand('SELECT COUNT(*) FROM tool_likes WHERE tool_name = :tool_name', [':tool_name' => $toolName])->queryScalar();
+
+            // 返回点赞数
+            return $this->asJson([
+                'success' => true,
+                'likes_count' => $likesCount,  // 返回更新后的点赞数
+            ]);
+        } catch (\Exception $e) {
+            return $this->asJson(['success' => false, 'message' => 'You have liked this tool!']);
+        }
+    }
+
+    public function actionLikePaper()
+    {
+        
+
+        if (Yii::$app->user->isGuest) {
+            Yii::$app->session->setFlash('error', 'You must be logged in to post a comment.');
+            return $this->redirect(['site/login']);
+        }
+
+        $userId = Yii::$app->user->id;  // 获取当前用户 ID
+        $paperId = Yii::$app->request->post('paper_id');  // 获取论文 ID
+
+        // 检查用户ID和论文ID是否有效
+        if (!$userId || !$paperId) {
+            return $this->asJson(['success' => false, 'message' => 'User ID or Paper ID is missing.']);
+        }
+
+        try {
+            // 插入点赞记录到数据库
+            Yii::$app->db->createCommand()->insert('paper_likes', [
+                'user_id' => $userId,
+                'paper_id' => $paperId,
+                'created_at' => new \yii\db\Expression('NOW()'),  // 当前时间
+            ])->execute();
+            
+            Yii::info("Inserted like record for Paper ID: $paperId, User ID: $userId", __METHOD__);
+
+            // 获取更新后的点赞数
+            $likesCount = Yii::$app->db->createCommand('SELECT COUNT(*) FROM paper_likes WHERE paper_id = :paper_id', [':paper_id' => $paperId])->queryScalar();
+
+            Yii::info("Likes count for Paper ID: $paperId updated to: $likesCount", __METHOD__);
+
+            // 获取更新后的点赞数
+            //$likesCount = Yii::$app->db->createCommand('SELECT COUNT(*) FROM paper_likes WHERE paper_id = :paper_id', [':paper_id' => $paperId])->queryScalar();
+
+            // 返回点赞数
+            return $this->asJson([
+                'success' => true,
+                'likes_count' => $likesCount,  // 返回更新后的点赞数
+            ]);
+        } catch (\Exception $e) {
+            Yii::error("Error occurred while liking paper $paperId: " . $e->getMessage(), __METHOD__);
+            return $this->asJson(['success' => false, 'message' => 'You have liked this paper!']);
+        }
+    }
+
 }
+

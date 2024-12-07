@@ -2,7 +2,7 @@
 
 /* @var $this yii\web\View */
 /* @var $form yii\bootstrap\ActiveForm */
-/* @var $model \common\models\LoginForm */
+/* @var $model \backend\models\LoginFormAdministor */  
 
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
@@ -120,11 +120,14 @@ $this->params['breadcrumbs'][] = $this->title;
 
         <?php $form = ActiveForm::begin(['id' => 'login-form']); ?>
 
-        <?= $form->field($model, 'username')->textInput(['autofocus' => true, 'placeholder' => 'Username']) ?>
+        <!-- 用户名输入框 -->
+        <?= $form->field($model, 'administorname')->textInput(['autofocus' => true, 'placeholder' => 'Username'])->label(false) ?>
 
-        <?= $form->field($model, 'password')->passwordInput(['placeholder' => 'Password']) ?>
+        <!-- 密码输入框 -->
+        <?= $form->field($model, 'password')->passwordInput(['placeholder' => 'Password'])->label(false) ?>
 
-        <?= $form->field($model, 'rememberMe')->checkbox() ?>
+        <!-- 记住我复选框 -->
+        <?= $form->field($model, 'rememberMe')->checkbox()->label('Remember Me') ?>
 
         <div class="form-group">
             <?= Html::submitButton('Login', ['class' => 'btn btn-primary', 'name' => 'login-button']) ?>

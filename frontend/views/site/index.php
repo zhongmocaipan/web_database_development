@@ -4,7 +4,7 @@
 
 use yii\helpers\Html;
 
-$this->title = 'WELECOME TO THE MOVIE FORUM';
+$this->title = 'World Artificial Intelligence Ranking 1996-2021';
 ?>
 
 <style>
@@ -125,6 +125,8 @@ $this->title = 'WELECOME TO THE MOVIE FORUM';
     }
 </style>
 
+
+
 <div class="site-index">
     <div class="jumbotron">
         <h1><?= Html::encode($this->title) ?></h1>
@@ -136,7 +138,7 @@ $this->title = 'WELECOME TO THE MOVIE FORUM';
         <div class="row">
             <!-- 电影推荐部分 -->
             <div class="col-lg-4">
-                <h2>language classification</h2>
+                <h2>paper about chronicle of AI</h2>
                 <p>you can find movie with language</p>
                 <p></p><a class="btn btn-default" href="<?= \yii\helpers\Url::to(['site/recommended']) ?>">See Recommended Movies &raquo;</a></p>
 
@@ -144,14 +146,14 @@ $this->title = 'WELECOME TO THE MOVIE FORUM';
 
             <!-- 热门电影部分 -->
             <div class="col-lg-4">
-                <h2>type classification</h2>
+                <h2>know about chronicle of AI</h2>
                 <p>you can find movie with type</p>
                 <p><a class="btn btn-default" href="<?= \yii\helpers\Url::to(['site/popular']) ?>">View Popular Movies &raquo;</a></p>
             </div>
 
             <!-- 电影论坛部分 -->
             <div class="col-lg-4">
-                <h2>id classification</h2>
+                <h2>AI tools</h2>
                 <p>you can find movie with id</p>
                 <p><a class="btn btn-default" href="<?= \yii\helpers\Url::to(['site/forum']) ?>">Visit the Forum &raquo;</a></p>
             </div>
@@ -162,10 +164,11 @@ $this->title = 'WELECOME TO THE MOVIE FORUM';
 </div>
 
 <!-- 背景图片轮播 -->
+<!-- 背景图片轮播 -->
 <div class="background-slideshow">
-    <img src="<?= Yii::getAlias('@web') ?>/assets/images/背景图片1.jpg" class="active">
-    <img src="<?= Yii::getAlias('@web') ?>/assets/images/背景图片2.jpg">
-    <img src="<?= Yii::getAlias('@web') ?>/assets/images/背景图片3.jpg">
+    <img src="<?= Yii::getAlias('@web') ?>/images/背景图片1.jpg" class="active">
+    <img src="<?= Yii::getAlias('@web') ?>/images/背景图片2.jpg">
+    <img src="<?= Yii::getAlias('@web') ?>/images/背景图片3.jpg">
 </div>
 
 <!-- 图片轮播 JavaScript -->
