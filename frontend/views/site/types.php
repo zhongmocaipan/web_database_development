@@ -346,5 +346,4 @@ $this->registerCss('
         padding: 10px;
     }
 ');
-
-?>
+?> 

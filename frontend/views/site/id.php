@@ -1,107 +1,100 @@
 <?php
-use yii\helpers\Html;
-use yii\widgets\ActiveForm;
-use yii\helpers\Url;
+/* @var $this yii\web\View */
+/* @var $tools array 数据库中所有工具的数组 */
 
-$this->registerCssFile('@web/css/style.css');
+use yii\helpers\Html;
+use yii\helpers\Url;
+use yii\widgets\ActiveForm; 
 ?>
 
 <h1>AI 工具列表</h1>
 
-<!-- 搜索框 -->
-<div class="search-form">
+<!-- 筛选工具状态 -->
+<div class="search-bar">
     <?php $form = ActiveForm::begin([
-        'id' => 'search-form',
         'method' => 'get',
-        'action' => '',
-        'options' => ['class' => 'form-inline', 'data-pjax' => 1]
+        'action' => Url::to(['site/ai_tool']),
+        'options' => ['class' => 'form-inline'],
     ]); ?>
-    
-    <div class="form-group">
-        <label for="douban-id-search" class="sr-only">Search by Douban ID:</label>
-        <!-- 保持搜索框的值为当前搜索条件 -->
-        <input type="text" id="douban-id-search" name="douban_id" class="form-control" 
-               placeholder="Enter Douban ID" value="<?= Html::encode($searchTerm ?? '') ?>">
-    </div>
-    
+    <?= Html::dropDownList('tool_status', null, [
+        'Free' => 'Free',
+        'Paid' => 'Paid',
+        'Freemium' => 'Freemium',
+        'Contact for Pricing' => 'Contact for Pricing',
+        'Free Trial' => 'Free Trial',
+        'Other' => 'Other'
+    ], ['class' => 'form-control', 'prompt' => '选择工具状态']) ?>
+    <?= Html::submitButton('搜索', ['class' => 'btn btn-primary']) ?>
     <?php ActiveForm::end(); ?>
 </div>
 
-<?php
-// 获取搜索条件
-$searchTerm = isset($_GET['douban_id']) ? $_GET['douban_id'] : null;
-
-// 筛选匹配的电影
-if ($searchTerm) {
-    $filteredMovies = array_filter($movies, function($movie) use ($searchTerm) {
-        return stripos($movie['douban_id'], $searchTerm) !== false; // 模糊匹配
-    });
-} else {
-    $filteredMovies = $movies; // 如果没有搜索条件，则显示所有电影
-}
-?>
-
-<div id="movie-list" class="row">
-    <?php if ($filteredMovies): ?>
-        <?php foreach ($filteredMovies as $movie): ?>
+<!-- 工具列表 -->
+<?php if (empty($tools)): ?>
+    <p>没有找到任何工具。</p>
+<?php else: ?>
+    <div class="row">
+        <?php foreach ($tools as $tool): ?>
             <div class="col-lg-4">
-                <div class="movie-box">
-                    <h3>Douban ID: <?= Html::encode($movie['douban_id']) ?></h3>
-                    <p><strong>Title:</strong> <?= Html::encode($movie['title']) ?></p>
-                    <p><strong>Directors:</strong> <?= Html::encode($movie['directors']) ?></p>
-                    <p><strong>Scriptwriters:</strong> <?= Html::encode($movie['scriptwriters']) ?></p>
-                    <p><strong>Actors:</strong> <?= Html::encode($movie['actors']) ?></p>
-                    <p><strong>Types:</strong> <?= Html::encode($movie['types']) ?></p>
-                    <p><strong>Release Region:</strong> <?= Html::encode($movie['release_region']) ?></p>
+                <div class="paper-box">
+                    <h3><?= Html::encode($tool['AI Tool Name']) ?></h3>
+                    <p><strong>描述：</strong> <?= Html::encode($tool['Description']) ?></p>
+                    <p><strong>免费/付费：</strong> <?= Html::encode($tool['Free/Paid/Other']) ?></p>
+                    <p><strong>适用领域：</strong> <?= Html::encode($tool['Useable For']) ?></p>
+                    <p>
+                        <!-- 添加评论按钮，点击后跳转到评论页面 -->
+                        <a class="btn btn-default" href="<?= Url::to(['site/toolcomment', 'tool_name' => $tool['AI Tool Name']]) ?>">评论 & 点赞</a>
+                    </p>
                 </div>
             </div>
         <?php endforeach; ?>
-    <?php else: ?>
-        <p>No movies found for the search term: <?= Html::encode($searchTerm) ?>.</p>
-    <?php endif; ?>
-</div>
+    </div>
+<?php endif; ?>
 
 <?php
-// 添加样式来调整搜索框和电影展示
+// 注册样式
 $this->registerCss('
-    .search-form {
+    body {
+            background-image: url("' . Yii::getAlias('@web/images/background.jpg') . '");
+            background-size: cover; /* 背景图像覆盖整个页面 */
+            background-attachment: fixed; /* 背景固定不滚动 */
+            background-position: center; /* 背景居中 */
+            background-repeat: no-repeat; /* 不重复背景图片 */
+            color: #333; /* 字体颜色，确保在背景上清晰可见 */
+        }
+    h1 {
+        font-size: 48px; /* 增加字号 */
+        color: #f0f0f0; /* 设置浅色字体 */
+        font-weight: bold; /* 加粗字体 */
+        text-align: center; /* 居中对齐标题 */
+        margin-top: 30px; /* 顶部留白 */
+    }
+    .search-bar {
         margin-bottom: 20px;
+        text-align: center;
     }
-    .search-form input {
-        width: 250px;
-        margin-right: 10px;
+    .search-bar .form-control {
+        width: 300px;
+        display: inline-block;
     }
-    .search-form button {
-        margin-top: 10px;
-    }
-    .movie-box {
+    .paper-box {
         padding: 15px;
         border: 1px solid #ddd;
         border-radius: 5px;
         margin-bottom: 20px;
-        background-color: #f9f9f9;
+        background-color: rgba(255, 255, 255, 0.9);
+        min-height: 400px; /* 调整框的最小高度 */
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
     }
-    .movie-box p {
+    .paper-box h3 {
+        color: #4e73df;
+    }
+    .paper-box p {
         margin: 5px 0;
     }
-');
-?>
-
-<?php
-// 添加 JS 来实现 AJAX 实时搜索
-$this->registerJs('
-    $("#douban-id-search").on("input", function() {
-        // 获取搜索框的值
-        var searchTerm = $("#douban-id-search").val();
-        
-        // 使用 pjax 请求刷新电影列表，带上搜索条件
-        $.pjax.reload({
-            container: "#movie-list", // 刷新电影列表部分
-            timeout: 5000, // 请求超时设置
-            push: false, // 禁用浏览器历史记录更新
-            replace: false, // 不替换当前历史记录
-            data: {douban_id: searchTerm} // 传递搜索条件
-        });
-    });
+    .row {
+        margin-top: 20px;
+    }
 ');
 ?>
