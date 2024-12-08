@@ -55,19 +55,23 @@ $this->title = 'Admin Dashboard';
             </div>
 
             <!-- 主要内容区域 -->
-            <div class="col-md-9">
+            <div class="col-md-9 move-up">
                 <div class="jumbotron">
                     <div class="container">
-                        <!-- Paper Likes -->
+                        <!-- Paper Likes 饼状图 -->
                         <div class="col-md-6">
                             <h3>Paper Likes</h3>
-                            <canvas id="paperLikesChart"></canvas> <!-- Paper Likes Chart -->
+                                <div style="width: 300px; height: 300px; margin: 0 auto;"> <!-- 调整大小 -->
+                                    <canvas id="paperLikesPieChart"></canvas>
+                                </div>
                         </div>
 
-                        <!-- Paper Comments -->
+                        <!-- Paper Comments 饼状图 -->
                         <div class="col-md-6">
                             <h3>Paper Comments</h3>
-                            <canvas id="paperCommentsChart"></canvas> <!-- Paper Comments Chart -->
+                            <div style="width: 300px; height: 300px; margin: 0 auto;"> <!-- 调整大小 -->
+                                <canvas id="paperCommentsPieChart"></canvas>
+                            </div>
                         </div>
                     </div>
 
@@ -136,78 +140,115 @@ $this->title = 'Admin Dashboard';
 <!-- 引入Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
 
+<!-- 引入chartjs-plugin-wordcloud -->
+<!-- <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-wordcloud"></script> -->
+<script src="https://cdn.jsdelivr.net/npm/chartjs-chart-wordcloud"></script>
+
+<?php
+$filteredPaperTitles = array_map(function ($title) {
+    $words = explode(' ', $title);
+    return $words[0]; // 仅保留标题的第一个单词
+}, $paperTitles);
+
+$filteredCommentTitles = array_map(function ($title) {
+    $words = explode(' ', $title);
+    return $words[0]; // 仅保留标题的第一个单词
+}, $paperCommentTitles);
+?>
+
 <script>
-    // Paper Likes Chart
-    var ctx1 = document.getElementById('paperLikesChart').getContext('2d');
-    var paperLikesChart = new Chart(ctx1, {
-        type: 'bar',
+window.onload = function () {
+    // 计算 Paper Likes 数据占比
+    var paperLikesData = <?= json_encode($paperLikes) ?>;
+    var filteredTitlesForLikes = <?= json_encode($filteredPaperTitles) ?>;
+    var filteredLikes = paperLikesData.filter(count => count > 0); // 过滤点赞数为0的文章
+    var paperLikesTotal = filteredLikes.reduce((a, b) => a + b, 0); // 总点赞数
+    var paperLikesPercentage = filteredLikes.map(function (count) {
+        return ((count / paperLikesTotal) * 100).toFixed(2); // 百分比计算并保留两位小数
+    });
+
+    // Paper Likes 饼状图
+    var ctx1 = document.getElementById('paperLikesPieChart').getContext('2d');
+    var paperLikesPieChart = new Chart(ctx1, {
+        type: 'pie',
         data: {
-            labels: <?= json_encode($paperTitles) ?>, // 从控制器传递的数据
+            labels: filteredTitlesForLikes, // 使用过滤后的标题
             datasets: [{
-                label: 'Likes Count',
-                data: <?= json_encode($paperLikes) ?>, // 从控制器传递的数据
-                backgroundColor: '#ffc107', // Yellow for Likes
-                borderColor: '#e0a800',
-                borderWidth: 1
+                label: 'Percentage of Likes (%)',
+                data: paperLikesPercentage,
+                backgroundColor: ['#ff6384', '#36a2eb', '#ffce56', '#4bc0c0', '#9966ff', '#ff9f40'],
+                hoverOffset: 4
             }]
         },
         options: {
             responsive: true,
             plugins: {
-                legend: {
-                    position: 'top',
-                },
                 tooltip: {
                     callbacks: {
-                        label: function(tooltipItem) {
-                            return tooltipItem.dataset.label + ': ' + tooltipItem.raw;
+                        label: function (tooltipItem) {
+                            var label = tooltipItem.label || '';
+                            var value = tooltipItem.raw || 0;
+                            return label + ': ' + value + '%'; // 显示百分比
                         }
                     }
-                }
-            },
-            scales: {
-                x: {
-                    beginAtZero: true
+                },
+                legend: {
+                    display: true,
+                    position: 'top'
                 }
             }
         }
     });
 
-    // Paper Comments Chart
-    var ctx2 = document.getElementById('paperCommentsChart').getContext('2d');
-    var paperCommentsChart = new Chart(ctx2, {
-        type: 'bar',
+    // 计算 Paper Comments 数据占比
+    var paperCommentsData = <?= json_encode($paperCommentCounts) ?>;
+    var filteredTitlesForComments = <?= json_encode($filteredCommentTitles) ?>;
+    var filteredComments = paperCommentsData.filter(count => count > 0); // 过滤评论数为0的文章
+    var paperCommentsTotal = filteredComments.reduce((a, b) => a + b, 0); // 总评论数
+    var paperCommentsPercentage = filteredComments.map(function (count) {
+        return ((count / paperCommentsTotal) * 100).toFixed(2); // 百分比计算并保留两位小数
+    });
+
+    // Paper Comments 饼状图
+    var ctx2 = document.getElementById('paperCommentsPieChart').getContext('2d');
+    var paperCommentsPieChart = new Chart(ctx2, {
+        type: 'pie',
         data: {
-            labels: <?= json_encode($paperCommentTitles) ?>, // 从控制器传递的数据
+            labels: filteredTitlesForComments, // 使用过滤后的标题
             datasets: [{
-                label: 'Comments Count',
-                data: <?= json_encode($paperCommentCounts) ?>, // 从控制器传递的数据
-                backgroundColor: '#17a2b8', // Blue for Comments
-                borderColor: '#138496',
-                borderWidth: 1
+                label: 'Percentage of Comments (%)',
+                data: paperCommentsPercentage,
+                backgroundColor: ['#4bc0c0', '#9966ff', '#ff9f40', '#ff6384', '#36a2eb', '#ffce56'],
+                hoverOffset: 4
             }]
         },
         options: {
             responsive: true,
             plugins: {
-                legend: {
-                    position: 'top',
-                },
                 tooltip: {
                     callbacks: {
-                        label: function(tooltipItem) {
-                            return tooltipItem.dataset.label + ': ' + tooltipItem.raw;
+                        label: function (tooltipItem) {
+                            var label = tooltipItem.label || '';
+                            var value = tooltipItem.raw || 0;
+                            return label + ': ' + value + '%'; // 显示百分比
                         }
                     }
-                }
-            },
-            scales: {
-                x: {
-                    beginAtZero: true
+                },
+                legend: {
+                    display: true,
+                    position: 'top'
                 }
             }
         }
     });
+};
+</script>
+
+
+<!-- <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-wordcloud"></script> -->
+
+<script>
+ 
 
     // AI Tool Likes Chart
     var ctx3 = document.getElementById('aiToolLikesChart').getContext('2d');
@@ -322,6 +363,11 @@ var paperCommentsChart = new Chart(ctx2, {
         padding-top: 20px;
     }
 
+    .move-up {
+        margin-top: -30px; /* 向上移动内容区域 */
+    }
+
+
     .card {
         margin-bottom: 20px;
     }
@@ -334,6 +380,13 @@ var paperCommentsChart = new Chart(ctx2, {
     .jumbotron {
     background-color: #f1f1f1; /* 原始背景色 */
     opacity: 0.55; /* 50% 透明度 */
+    width: 80%; /* 调整宽度，比如设为80%或固定px值 */
+    max-width: 900px; /* 限制最大宽度 */
+    height: auto; /* 根据内容自动调整高度 */
+    padding: 20px; /* 减少内边距 */
+    margin: 20px auto; /* 居中显示，设置外边距 */
+    border-radius: 10px; /* 添加圆角效果 */
+
     }
 
     .navbar {
@@ -355,6 +408,8 @@ var paperCommentsChart = new Chart(ctx2, {
 
     /* 使柱状图之间有间隔 */
     canvas {
+        width: 300px; /* 限制宽度，例如 300px */
+        height: 300px; /* 限制高度，例如 300px */
         margin-bottom: 30px;
     }
 
@@ -375,5 +430,10 @@ var paperCommentsChart = new Chart(ctx2, {
     /* 使卡片区域与图表有间距 */
     .mt-5 {
         margin-top: 50px;
+    }
+    .chart-container {
+    width: 300px; /* 统一宽度 */
+    height: 300px; /* 统一高度 */
+    margin: 0 auto; /* 居中 */
     }
 </style>
