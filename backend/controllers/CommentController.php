@@ -63,17 +63,6 @@ class CommentController extends Controller
         ]);
     }
 
-    // public function actionDeleteComment($toolName)
-    // {
-    //     $tool = AllAiTool::findOne(['AI Tool Name' => $toolName]);
-    //     if ($tool) {
-    //         $tool->delete();
-    //     }
-    
-    //     // 重定向到评论页面
-    //     return $this->redirect(['comment/ai-tool']);
-    // }
-
     // 在 CommentController 中的 viewComments 方法中获取评论并进行分页
     public function actionViewComments($toolName)
     {

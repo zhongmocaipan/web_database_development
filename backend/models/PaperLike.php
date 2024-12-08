@@ -31,4 +31,6 @@ class PaperLike extends ActiveRecord
     {
         return $this->hasOne(User::class, ['id' => 'user_id']);
     }
+
+    
 }

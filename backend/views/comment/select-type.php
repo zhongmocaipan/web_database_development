@@ -15,7 +15,7 @@ $this->title = 'Select Comment Type';
                     <h5>AI Tool Comments</h5>
                 </div>
                 <div class="card-body">
-                    <p>View and manage comments for AI tools.</p>
+                    <p style="color: white;">View and manage comments for AI tools.</p>
                     <a href="<?= \yii\helpers\Url::to(['comment/ai-tool']) ?>" class="btn btn-primary btn-block hover-btn">Go to AI Tool Comments</a>
                 </div>
             </div>
@@ -28,7 +28,7 @@ $this->title = 'Select Comment Type';
                     <h5>Paper Comments</h5>
                 </div>
                 <div class="card-body">
-                    <p>View and manage comments for papers.</p>
+                    <p style="color: white;">View and manage comments for papers.</p>
                     <a href="<?= \yii\helpers\Url::to(['comment/paper']) ?>" class="btn btn-success btn-block hover-btn">Go to Paper Comments</a>
                 </div>
             </div>
@@ -71,12 +71,14 @@ $this->title = 'Select Comment Type';
     h1 {
         font-family: 'Arial', sans-serif;
         font-weight: bold;
-        color: #333;
+        color: white;
     }
 
     .card-header h5 {
     font-weight: bold;
     font-size: 2rem; /* 设置字体大小 */
+    text-align: center;
+
     }
     /* 自适应卡片大小 */
     .col-md-6 {

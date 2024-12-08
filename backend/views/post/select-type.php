@@ -15,7 +15,7 @@ $this->title = 'Select Like Type';
                     <h5>AI Tool Likes</h5>
                 </div>
                 <div class="card-body">
-                    <p>View and manage likes for AI tools.</p>
+                    <p style="color: white;">View and manage likes for AI tools.</p> <!-- 修改字体颜色为白色 -->
                     <a href="<?= \yii\helpers\Url::to(['post/ai-tool']) ?>" class="btn btn-primary btn-block hover-btn">Go to AI Tool Likes</a>
                 </div>
             </div>
@@ -28,7 +28,7 @@ $this->title = 'Select Like Type';
                     <h5>Paper Likes</h5>
                 </div>
                 <div class="card-body">
-                    <p>View and manage likes for papers.</p>
+                    <p style="color: white;">View and manage likes for papers.</p> <!-- 修改字体颜色为白色 -->
                     <a href="<?= \yii\helpers\Url::to(['post/paper']) ?>" class="btn btn-success btn-block hover-btn">Go to Paper Likes</a>
                 </div>
             </div>
@@ -38,7 +38,7 @@ $this->title = 'Select Like Type';
 
 <style>
     h1 {
-    margin-bottom:200px;  /* 自定义更大的间距 */
+        margin-bottom:200px;  /* 自定义更大的间距 */
     }
 
     /* 页面背景渐变 */
@@ -71,13 +71,15 @@ $this->title = 'Select Like Type';
     h1 {
         font-family: 'Arial', sans-serif;
         font-weight: bold;
-        color: #333;
+        color: white;
     }
 
     .card-header h5 {
-    font-weight: bold;
-    font-size: 2rem; /* 设置字体大小 */
+        font-weight: bold;
+        font-size: 2rem; /* 设置字体大小 */
+        text-align: center;
     }
+
     /* 自适应卡片大小 */
     .col-md-6 {
         margin-bottom: 20px;

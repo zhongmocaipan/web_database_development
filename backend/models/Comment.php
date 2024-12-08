@@ -27,6 +27,7 @@ class Comment extends ActiveRecord
     {
         return $this->hasOne(ArxivPaper::class, ['id' => 'paper_id']);
     }
+    
 
     public function getUser()
     {
