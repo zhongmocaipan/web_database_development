@@ -130,8 +130,8 @@ $this->title = 'World Artificial Intelligence Ranking 1996-2021';
 <div class="site-index">
     <div class="jumbotron">
         <h1><?= Html::encode($this->title) ?></h1>
-        <p class="lead">WELCOME TO THE MOVIE FORUM</p>
-        <p><a class="btn btn-lg btn-success" href="http://www.yiiframework.com">Get started with Yii</a></p>
+        <p class="lead">WELCOME TO THE PAPER FORUM</p>
+        <p><a class="btn btn-lg btn-success" href="<?= \yii\helpers\Url::to(['site/videos']) ?>">See The Videos</a></p>
     </div>
 
     <div class="body-content">
@@ -139,8 +139,8 @@ $this->title = 'World Artificial Intelligence Ranking 1996-2021';
             <!-- 电影推荐部分 -->
             <div class="col-lg-4">
                 <h2>paper about chronicle of AI</h2>
-                <p>you can find movie with language</p>
-                <p></p><a class="btn btn-default" href="<?= \yii\helpers\Url::to(['site/recommended']) ?>">See Recommended Movies &raquo;</a></p>
+                <p>you can find paper with published</p>
+                <p></p><a class="btn btn-default" href="<?= \yii\helpers\Url::to(['site/recommended']) ?>">See Recommended Papers &raquo;</a></p>
 
             </div>
 

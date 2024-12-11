@@ -72,6 +72,33 @@ $this->params['breadcrumbs'][] = $this->title;
         font-size: 12px;
     }
 
+    /* Leader 部分样式 */
+    .leader-section {
+        margin-bottom: 30px;
+        text-align: center; /* 居中对齐 */
+    }
+
+    .leader-section img {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%; /* 圆形头像 */
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        margin-bottom: 15px;
+    }
+
+    .leader-section h2 {
+        font-size: 24px;
+        color: #4e73df;
+        margin-bottom: 10px;
+    }
+
+    .leader-section p {
+        font-size: 16px;
+        color: #333;
+        margin-bottom: 20px;
+    }
+
+    /* 其他样式 */
     .about-container h1 {
         font-size: 24px;
         color: #4e73df;
@@ -124,48 +151,53 @@ $this->params['breadcrumbs'][] = $this->title;
     }
 
     .features {
-    margin-top: 30px;
-    text-align: center; /* 将内容居中对齐 */
-}
+        margin-top: 30px;
+        text-align: center; /* 将内容居中对齐 */
+    }
 
     .features h2 {
-    font-size: 24px;
-    color: #4e73df;
-    margin-bottom: 15px;
-}
+        font-size: 24px;
+        color: #4e73df;
+        margin-bottom: 15px;
+    }
 
     .features ul {
-    list-style: none;
-    padding-left: 0;
-    display: inline-block; /* 让列表居中 */
-    text-align: left; /* 列表项内容保持左对齐 */
-}
+        list-style: none;
+        padding-left: 0;
+        display: inline-block; /* 让列表居中 */
+        text-align: left; /* 列表项内容保持左对齐 */
+    }
 
     .features ul li {
-    font-size: 14px;
-    margin-bottom: 10px;
-    color: #333;
-    display: flex;
-    align-items: center;
-}
+        font-size: 14px;
+        margin-bottom: 10px;
+        color: #333;
+        display: flex;
+        align-items: center;
+    }
 
     .features ul li::before {
-    content: '✔️';
-    color: #4e73df;
-    margin-right: 10px;
-}
-
-
+        content: '✔️';
+        color: #4e73df;
+        margin-right: 10px;
+    }
 </style>
 
 <div class="site-about">
     <div class="about-container">
+        <!-- Leader 介绍 -->
+        <div class="leader-section">
+            <img src="<?= Yii::getAlias('@web') ?>/assets/images/leader.png" alt="Leader Photo">
+            <h2>Leader: Emily Carter</h2>
+            <p>Emily is a visionary leader who founded the Movie Review Hub to bring together film enthusiasts worldwide. With a passion for storytelling and innovation, she inspires the team to create a truly remarkable platform.</p>
+        </div>
+
         <h1><?= Html::encode($this->title) ?></h1>
         <p>
             Welcome to Movie Review Hub! A platform designed for movie enthusiasts to explore, review, and discuss films. Our goal is to create an engaging community for sharing your thoughts and discovering hidden cinematic gems.
         </p>
 
-        <div class="features">
+        <!-- <div class="features">
             <h2>Key Features</h2>
             <ul>
                 <li>Post and read detailed movie reviews from users worldwide.</li>
@@ -174,24 +206,24 @@ $this->params['breadcrumbs'][] = $this->title;
                 <li>Create and manage your watchlist effortlessly.</li>
                 <li>Explore trending movies and critically acclaimed classics.</li>
             </ul>
-        </div>
+        </div> -->
 
         <div class="team">
             <h2>Meet the Team</h2>
             <div class="team-member">
-                <img src="<?= Yii::getAlias('@web') ?>/assets/images/team1.jpg" alt="Team Member">
+                <img src="<?= Yii::getAlias('@web') ?>/assets/images/背景图片2.jpg" alt="Team Member">
                 <span>Jane Doe</span>
                 <p>Founder & CEO</p>
                 <p>Jane is a film enthusiast and entrepreneur dedicated to creating the best movie review platform.</p>
             </div>
             <div class="team-member">
-                <img src="<?= Yii::getAlias('@web') ?>/assets/images/team2.jpg" alt="Team Member">
+                <img src="<?= Yii::getAlias('@web') ?>/assets/images/背景图片2.jpg" alt="Team Member">
                 <span>John Smith</span>
                 <p>CTO</p>
                 <p>John is the technical genius behind the platform, ensuring a seamless user experience.</p>
             </div>
             <div class="team-member">
-                <img src="<?= Yii::getAlias('@web') ?>/assets/images/team3.jpg" alt="Team Member">
+                <img src="<?= Yii::getAlias('@web') ?>/assets/images/背景图片3.jpg" alt="Team Member">
                 <span>Mary Johnson</span>
                 <p>Head of Design</p>
                 <p>Mary brings the platform to life with her innovative and user-friendly designs.</p>
@@ -202,9 +234,9 @@ $this->params['breadcrumbs'][] = $this->title;
 
 <!-- 背景图片轮播 -->
 <div class="background-slideshow">
-    <img src="<?= Yii::getAlias('@web') ?>/assets/images/movie1.jpg" class="active">
-    <img src="<?= Yii::getAlias('@web') ?>/assets/images/movie2.jpg">
-    <img src="<?= Yii::getAlias('@web') ?>/assets/images/movie3.jpg">
+    <img src="<?= Yii::getAlias('@web') ?>/assets/images/背景图片1.jpg" class="active">
+    <img src="<?= Yii::getAlias('@web') ?>/assets/images/背景图片2.jpg">
+    <img src="<?= Yii::getAlias('@web') ?>/assets/images/背景图片3.jpg">
 </div>
 
 <script>
