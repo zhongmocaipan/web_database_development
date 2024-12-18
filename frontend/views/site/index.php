@@ -4,7 +4,9 @@
 
 use yii\helpers\Html;
 
-$this->title = 'World Artificial Intelligence Ranking 1996-2021';
+$this->title = 'love AI? click us!
+you will find something interesting
+';
 ?>
 
 <style>
@@ -91,10 +93,24 @@ $this->title = 'World Artificial Intelligence Ranking 1996-2021';
     }
 
     .row {
-        display: flex;
-        justify-content: space-between;
+        display: flex; /* 使 .row 变为 flex 容器 */
+        flex-wrap: wrap; /* 允许换行 */
+        align-items: stretch; /* 拉伸所有子元素高度一致 */
     }
 
+    .content-box {
+        display: flex;
+        flex-direction: column; /* 垂直排列内容 */
+        justify-content: space-between; /* 内容与按钮保持底部对齐 */
+        text-align: center; /* 居中文本和按钮 */
+        background-color: #f9f9f9; /* 添加背景色 */
+        border: 1px solid #ddd; /* 添加边框 */
+        border-radius: 8px; /* 圆角边框 */d
+        padding: 20px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 阴影效果 */
+        box-sizing: border-box;
+        flex: 1; /* 确保框在 Flex 布局中均分空间 */
+    }
     .col-lg-4 {
         flex: 1;
         margin: 0 10px;
@@ -111,7 +127,9 @@ $this->title = 'World Artificial Intelligence Ranking 1996-2021';
     .col-lg-4 p {
         color: #333;
     }
-
+    .button-container {
+        margin-top: auto; /* 自动将按钮推到底部 */
+    }
     .btn-default {
         background-color: #4e73df;
         color: #fff;
@@ -130,36 +148,40 @@ $this->title = 'World Artificial Intelligence Ranking 1996-2021';
 <div class="site-index">
     <div class="jumbotron">
         <h1><?= Html::encode($this->title) ?></h1>
-        <p class="lead">WELCOME TO THE PAPER FORUM</p>
+        <p class="lead">WELCOME TO THE AI RESEARCHER FORUM</p>
         <p><a class="btn btn-lg btn-success" href="<?= \yii\helpers\Url::to(['site/videos']) ?>">See The Videos</a></p>
     </div>
 
     <div class="body-content">
-        <div class="row">
-            <!-- 电影推荐部分 -->
-            <div class="col-lg-4">
-                <h2>paper about chronicle of AI</h2>
-                <p>you can find paper with published</p>
-                <p></p><a class="btn btn-default" href="<?= \yii\helpers\Url::to(['site/recommended']) ?>">See Recommended Papers &raquo;</a></p>
-
+    <div class="row">
+        <!-- 电影推荐部分 -->
+        <div class="col-lg-4 content-box">
+            <h2>paper about chronicle of AI</h2>
+            <p>you can find paper published</p>
+            <div class="button-container">
+                <a class="btn btn-default" href="<?= \yii\helpers\Url::to(['site/recommended']) ?>">See Recommended Papers &raquo;</a>
             </div>
+        </div>
 
-            <!-- 热门电影部分 -->
-            <div class="col-lg-4">
-                <h2>know about chronicle of AI</h2>
-                <p>you can find movie with type</p>
-                <p><a class="btn btn-default" href="<?= \yii\helpers\Url::to(['site/popular']) ?>">View Popular Movies &raquo;</a></p>
+        <!-- 热门电影部分 -->
+        <div class="col-lg-4 content-box">
+            <h2>World AI Ranking </h2>
+            <p>you can find World Artificial Intelligence Ranking with type</p>
+            <div class="button-container">
+                <a class="btn btn-default" href="<?= \yii\helpers\Url::to(['site/popular']) ?>">View Popular Movies &raquo;</a>
             </div>
+        </div>
 
-            <!-- 电影论坛部分 -->
-            <div class="col-lg-4">
-                <h2>AI tools</h2>
-                <p>you can find movie with id</p>
-                <p><a class="btn btn-default" href="<?= \yii\helpers\Url::to(['site/forum']) ?>">Visit the Forum &raquo;</a></p>
+        <!-- 电影论坛部分 -->
+        <div class="col-lg-4 content-box">
+            <h2>AI tools finding</h2>
+            <p>you can find AI tools movie with id</p>
+            <div class="button-container">
+                <a class="btn btn-default" href="<?= \yii\helpers\Url::to(['site/forum']) ?>">Visit the Forum &raquo;</a>
             </div>
         </div>
     </div>
-
+</div>
 
 </div>
 

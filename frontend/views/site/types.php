@@ -39,6 +39,8 @@ $this->registerCssFile('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15
     </div>
 </div>
 
+
+
 <?php
 // 初始年份数据（用于页面加载时默认展示）
 $initialYear = isset($years[0]['year']) ? $years[0]['year'] : '';
@@ -88,8 +90,47 @@ $initialDataJson = json_encode($initialData);
 
                 // 更新三维图
                 update3DChart(data);
+                updateLineChart(data);
             }
         });
+    }
+  
+    function updateLineChart(data) {
+    // 提取数据：国家、文档数和引用数
+    var countries = data.map(function(country) { return country.region; });
+    var documents = data.map(function(country) { return parseFloat(country.documents); });
+    var citations = data.map(function(country) { return parseFloat(country.citations); });
+
+    // 创建折线图的traces
+    var traceDocuments = {
+            x: countries,
+            y: documents,
+            mode: 'lines+markers',
+            name: 'Documents',
+            line: { color: '#1f77b4', width: 2 },
+            marker: { color: '#1f77b4' }
+        };
+
+        var traceCitations = {
+            x: countries,
+            y: citations,
+            mode: 'lines+markers',
+            name: 'Citations',
+            line: { color: '#ff7f0e', width: 2 },
+            marker: { color: '#ff7f0e' }
+        };
+
+        var layout = {
+            title: 'Documents & Citations by Country',
+            xaxis: { title: 'Country' },
+            yaxis: { title: 'Count' },
+            plot_bgcolor: 'rgba(0, 0, 0, 0)',  // 设置背景透明
+            paper_bgcolor: 'rgba(0, 0, 0, 0.1)', // 设置透明背景
+            font: { color: '#fff' }  // 设置字体颜色为白色
+        };
+
+        // 使用Plotly绘制折线图
+        Plotly.newPlot('line-chart', [traceDocuments, traceCitations], layout);
     }
 
     // 生成弦图矩阵
@@ -174,109 +215,128 @@ $initialDataJson = json_encode($initialData);
             .style("stroke", function(d) { return color(d.target.index); });
         
         // 添加矩形框，表示每个国家的颜色
-        var legendContainer = d3.select("#chord-diagram").append("div").style("display", "flex").style("flex-direction", "column").style("margin-left", "20px");
-        
-        countries.forEach(function(country, i) {
-            var legendItem = legendContainer.append("div").style("display", "flex").style("align-items", "center").style("margin-bottom", "5px");
-            legendItem.append("div")
-                .style("width", "20px")
-                .style("height", "20px")
-                .style("background-color", color(i))
-                .style("margin-right", "10px");
-            legendItem.append("span")
-                .text(country)
-                .style("color", "#fff")
-                .style("font-size", "14px");
-        });
+       // 添加矩形框，表示每个国家的颜色
+var legendContainer = d3.select("#chord-diagram").append("div")
+    .style("display", "flex") // 水平排列
+    .style("flex-wrap", "wrap") // 自动换行
+    .style("margin-left", "20px")
+    .style("margin-top", "20px");
+
+countries.forEach(function(country, i) {
+    var legendItem = legendContainer.append("div")
+        .style("display", "flex")
+        .style("align-items", "center")
+        .style("margin-right", "15px") // 增加水平间距
+        .style("margin-bottom", "10px"); // 增加垂直间距
+
+    // 创建颜色矩形框
+    legendItem.append("div")
+        .style("width", "20px")
+        .style("height", "20px")
+        .style("background-color", color(i)) // 设置颜色
+        .style("margin-right", "5px"); // 矩形与文本之间的间距
+
+    // 创建文本标签
+    legendItem.append("span")
+        .text(country)
+        .style("color", "#fff")
+        .style("font-size", "14px")
+        .style("font-weight", "bold"); // 你可以调整字体样式
+});
+
     }
 
     // 更新三维图
     function update3DChart(data) {
-        var countries = data.map(function(country) { return country.region; });
-        var regions = data.map(function(country) { return country.region; });
+    var countries = data.map(function(country) { return country.region; });
+    var regions = data.map(function(country) { return country.region; });
 
-        // 提取不同属性数据
-        var documents = data.map(function(country) { return parseFloat(country.documents); });
-        var citableDocuments = data.map(function(country) { return parseFloat(country.citable_documents); });
-        var citations = data.map(function(country) { return parseFloat(country.citations); });
-        var selfCitations = data.map(function(country) { return parseFloat(country.self_citations); });
-        var citationsPerDocument = data.map(function(country) { return parseFloat(country.citations_per_document); });
-        var hIndex = data.map(function(country) { return parseFloat(country.h_index); });
+    // 提取不同属性数据
+    var documents = data.map(function(country) { return parseFloat(country.documents); });
+    var citableDocuments = data.map(function(country) { return parseFloat(country.citable_documents); });
+    var citations = data.map(function(country) { return parseFloat(country.citations); });
+    var selfCitations = data.map(function(country) { return parseFloat(country.self_citations); });
+    var citationsPerDocument = data.map(function(country) { return parseFloat(country.citations_per_document); });
+    var hIndex = data.map(function(country) { return parseFloat(country.h_index); });
 
-        // 定义不同颜色
-        var colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b'];
+    // 定义不同颜色
+    var colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b'];
 
-        // 为不同的属性创建多个系列
-        var traces = [
-            {
-                x: countries,
-                y: regions,
-                z: documents,
-                mode: 'markers',
-                marker: { size: 10, color: '#1f77b4' },
-                name: 'Documents',
-                type: 'scatter3d'
-            },
-            {
-                x: countries,
-                y: regions,
-                z: citableDocuments,
-                mode: 'markers',
-                marker: { size: 10, color: '#ff7f0e' },
-                name: 'Citable Documents',
-                type: 'scatter3d'
-            },
-            {
-                x: countries,
-                y: regions,
-                z: citations,
-                mode: 'markers',
-                marker: { size: 10, color: '#2ca02c' },
-                name: 'Citations',
-                type: 'scatter3d'
-            },
-            {
-                x: countries,
-                y: regions,
-                z: selfCitations,
-                mode: 'markers',
-                marker: { size: 10, color: '#d62728' },
-                name: 'Self Citations',
-                type: 'scatter3d'
-            },
-            {
-                x: countries,
-                y: regions,
-                z: citationsPerDocument,
-                mode: 'markers',
-                marker: { size: 10, color: '#9467bd' },
-                name: 'Citations per Document',
-                type: 'scatter3d'
-            },
-            {
-                x: countries,
-                y: regions,
-                z: hIndex,
-                mode: 'markers',
-                marker: { size: 10, color: '#8c564b' },
-                name: 'H-index',
-                type: 'scatter3d'
-            }
-        ];
+    // 为不同的属性创建多个系列
+    var traces = [
+        {
+            x: countries,
+            y: regions,
+            z: documents,
+            mode: 'markers',
+            marker: { size: 10, color: '#1f77b4' },
+            name: 'Documents',
+            type: 'scatter3d'
+        },
+        {
+            x: countries,
+            y: regions,
+            z: citableDocuments,
+            mode: 'markers',
+            marker: { size: 10, color: '#ff7f0e' },
+            name: 'Citable Documents',
+            type: 'scatter3d'
+        },
+        {
+            x: countries,
+            y: regions,
+            z: citations,
+            mode: 'markers',
+            marker: { size: 10, color: '#2ca02c' },
+            name: 'Citations',
+            type: 'scatter3d'
+        },
+        {
+            x: countries,
+            y: regions,
+            z: selfCitations,
+            mode: 'markers',
+            marker: { size: 10, color: '#d62728' },
+            name: 'Self Citations',
+            type: 'scatter3d'
+        },
+        {
+            x: countries,
+            y: regions,
+            z: citationsPerDocument,
+            mode: 'markers',
+            marker: { size: 10, color: '#9467bd' },
+            name: 'Citations per Document',
+            type: 'scatter3d'
+        },
+        {
+            x: countries,
+            y: regions,
+            z: hIndex,
+            mode: 'markers',
+            marker: { size: 10, color: '#8c564b' },
+            name: 'H-index',
+            type: 'scatter3d'
+        }
+    ];
 
-        // 设置图表布局
-        var layout = {
-            scene: {
-                xaxis: { title: 'Country' },
-                yaxis: { title: 'Region' },
-                zaxis: { title: 'Metrics' }
-            },
-            title: '3D Scatter Plot of Country Metrics'
-        };
+    // 设置图表布局
+    var layout = {
+        scene: {
+            xaxis: { title: 'Country' },
+            yaxis: { title: 'Region' },
+            zaxis: { title: 'Metrics' },
+            bgcolor: 'rgba(0,0,0,0)'  // 设置背景为透明
+        },
+        title: '3D Scatter Plot of Country Metrics',
+        plot_bgcolor: 'rgba(0,0,0,0)',  // 设置绘图区背景为透明
+        paper_bgcolor: 'rgba(0,0,0,0.5)',  // 设置整体背景为透明
+        font: { color: '#fff' }  // 设置字体颜色为白色，避免与背景混淆
+    };
 
-        // 清空之前的图形
-        Plotly.newPlot('threeD-chart', traces, layout);
-    }
+    // 清空之前的图形
+    Plotly.newPlot('threeD-chart', traces, layout);
+}
 
     // 页面加载时，如果有初始数据，渲染弦图和三维图
     <?php if ($initialYear): ?>
@@ -287,19 +347,28 @@ $initialDataJson = json_encode($initialData);
 </script>
 
 <style>
+    /* 隐藏底部的版权信息 */
+footer {
+    display: none;
+}
     #chord-diagram, #threeD-chart {
         width: 100%;
         height: 600px;
     }
-
+    #line-chart {
+    width: 100%;
+    height: 200px;  /* 设置折线图的高度为200px */
+}
     .row {
         display: flex;
         justify-content: space-between;
     }
 
     .col-lg-6 {
+        padding: 10px;
         flex: 0 0 48%;
     }
+
 
     .legend {
         display: flex;

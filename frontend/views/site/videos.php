@@ -12,6 +12,7 @@ $this->title = 'Video Player';
         font-family: Arial, sans-serif;
     }
 
+    /* 背景图片轮播样式 */
     .background-slideshow {
         position: fixed;
         top: 0;
@@ -46,6 +47,7 @@ $this->title = 'Video Player';
         10%, 90% { opacity: 1; }
     }
 
+    /* 视频容器样式 */
     .video-container {
         position: relative;
         display: flex;
@@ -87,6 +89,7 @@ $this->title = 'Video Player';
         border-radius: 10px;
     }
 
+    /* 导航按钮样式 */
     .nav-button {
         position: absolute;
         top: 50%;
@@ -100,7 +103,7 @@ $this->title = 'Video Player';
         z-index: 3;
         border-radius: 5px;
         transition: all 0.3s ease;
-        animation: pulse 2s infinite; /* 添加脉冲动画 */
+        animation: pulse 2s infinite;
     }
 
     .nav-button.left {
@@ -115,25 +118,24 @@ $this->title = 'Video Player';
     .nav-button:hover {
         background-color: rgba(255, 255, 255, 0.8);
         color: #000;
-        transform: translateY(-50%) scale(1.1); /* 放大 */
+        transform: translateY(-50%) scale(1.1);
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-        animation: bounce 0.5s; /* 悬停时触发弹跳动画 */
+        animation: bounce 0.5s;
     }
 
-    /* 脉冲动画效果 */
+    /* 脉冲动画 */
     @keyframes pulse {
         0% { transform: translateY(-50%) scale(1); }
         50% { transform: translateY(-50%) scale(1.05); }
         100% { transform: translateY(-50%) scale(1); }
     }
 
-    /* 弹跳动画效果 */
+    /* 弹跳动画 */
     @keyframes bounce {
         0%, 100% { transform: translateY(-50%) scale(1.1); }
         50% { transform: translateY(-45%) scale(1.2); }
     }
 </style>
-
 
 <!-- 背景图片轮播 -->
 <div class="background-slideshow">
@@ -142,20 +144,21 @@ $this->title = 'Video Player';
     <img src="<?= Yii::getAlias('@web') ?>/images/背景图片3.jpg">
 </div>
 
+<!-- 视频容器 -->
 <div class="video-container">
     <!-- 左侧视频 -->
     <div class="video-item video-left" onclick="navigate(<?= $prevIndex ?>)">
-        <video src="<?= $prevVideo ?>" muted loop></video>
+        <video src="<?= $prevVideo ?>" loop></video> <!-- 去掉 muted -->
     </div>
 
     <!-- 中间视频 -->
     <div class="video-item video-center">
-        <video id="center-video" src="<?= $currentVideo ?>" controls autoplay></video>
+        <video id="center-video" src="<?= $currentVideo ?>" controls></video>
     </div>
 
     <!-- 右侧视频 -->
     <div class="video-item video-right" onclick="navigate(<?= $nextIndex ?>)">
-        <video src="<?= $nextVideo ?>" muted loop></video>
+        <video src="<?= $nextVideo ?>" loop></video> <!-- 去掉 muted -->
     </div>
 
     <!-- 导航按钮 -->
@@ -163,7 +166,19 @@ $this->title = 'Video Player';
     <button class="nav-button right" onclick="navigate(<?= $nextIndex ?>)">&raquo;</button>
 </div>
 
+<!-- JavaScript -->
 <script>
+    // 页面加载后，用户点击中间视频播放
+    document.addEventListener('DOMContentLoaded', function () {
+        const centerVideo = document.getElementById('center-video');
+        centerVideo.addEventListener('click', () => {
+            if (centerVideo.paused) {
+                centerVideo.play();
+            }
+        });
+    });
+
+    // 导航到指定视频
     function navigate(index) {
         window.location.href = '?index=' + index;
     }

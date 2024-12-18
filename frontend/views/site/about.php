@@ -4,7 +4,7 @@
 
 use yii\helpers\Html;
 
-$this->title = 'About';
+$this->title = 'LOVEYII小组';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 
@@ -16,9 +16,9 @@ $this->params['breadcrumbs'][] = $this->title;
     }
 
     body {
-        height: 100vh;
+        height: auto;
         margin: 0;
-        overflow: hidden;
+        overflow-y: auto; /* 允许垂直滚动 */
         position: relative;
     }
 
@@ -56,9 +56,9 @@ $this->params['breadcrumbs'][] = $this->title;
         justify-content: center;
         align-items: center;
         z-index: 2;
-        height: 100%;
         text-align: center;
         padding: 20px;
+        margin-top: 20px; /* 适当调整顶部间距 */
     }
 
     .about-container {
@@ -75,15 +75,15 @@ $this->params['breadcrumbs'][] = $this->title;
     /* Leader 部分样式 */
     .leader-section {
         margin-bottom: 30px;
-        text-align: center; /* 居中对齐 */
+        text-align: center;
     }
 
     .leader-section img {
-        width: 150px;
-        height: 150px;
-        border-radius: 50%; /* 圆形头像 */
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        margin-bottom: 15px;
+        width: 100px;
+        height: 100px;
+        border-radius: 50%; 
+        margin-bottom: 10px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
     }
 
     .leader-section h2 {
@@ -98,7 +98,6 @@ $this->params['breadcrumbs'][] = $this->title;
         margin-bottom: 20px;
     }
 
-    /* 其他样式 */
     .about-container h1 {
         font-size: 24px;
         color: #4e73df;
@@ -152,7 +151,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     .features {
         margin-top: 30px;
-        text-align: center; /* 将内容居中对齐 */
+        text-align: center; 
     }
 
     .features h2 {
@@ -164,8 +163,8 @@ $this->params['breadcrumbs'][] = $this->title;
     .features ul {
         list-style: none;
         padding-left: 0;
-        display: inline-block; /* 让列表居中 */
-        text-align: left; /* 列表项内容保持左对齐 */
+        display: inline-block;
+        text-align: left;
     }
 
     .features ul li {
@@ -181,52 +180,62 @@ $this->params['breadcrumbs'][] = $this->title;
         color: #4e73df;
         margin-right: 10px;
     }
+
+    /* 下载按钮样式 */
+    .download-button {
+        display: inline-block;
+        margin-top: 10px;
+        padding: 8px 16px;
+        background-color: #4e73df;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        font-size: 14px;
+    }
+
+    .download-button:hover {
+        background-color: #3e64a1;
+    }
 </style>
 
 <div class="site-about">
     <div class="about-container">
         <!-- Leader 介绍 -->
-        <div class="leader-section">
-            <img src="<?= Yii::getAlias('@web') ?>/assets/images/leader.png" alt="Leader Photo">
-            <h2>Leader: Emily Carter</h2>
-            <p>Emily is a visionary leader who founded the Movie Review Hub to bring together film enthusiasts worldwide. With a passion for storytelling and innovation, she inspires the team to create a truly remarkable platform.</p>
-        </div>
-
         <h1><?= Html::encode($this->title) ?></h1>
         <p>
-            Welcome to Movie Review Hub! A platform designed for movie enthusiasts to explore, review, and discuss films. Our goal is to create an engaging community for sharing your thoughts and discovering hidden cinematic gems.
+            小组致力于做出ai相关的网页以发现更多的ai交流爱好者研究者。
         </p>
 
-        <!-- <div class="features">
-            <h2>Key Features</h2>
-            <ul>
-                <li>Post and read detailed movie reviews from users worldwide.</li>
-                <li>Personalized recommendations based on your viewing history.</li>
-                <li>Follow your favorite reviewers and interact with their posts.</li>
-                <li>Create and manage your watchlist effortlessly.</li>
-                <li>Explore trending movies and critically acclaimed classics.</li>
-            </ul>
-        </div> -->
+        <div class="leader-section">
+            <img src="<?= Yii::getAlias('@web') ?>/assets/images/背景图片1.jpg" alt="Leader Photo">
+            <h2>Leader: 刘芳宜</h2>
+            <p>负责前端整体框架和所有数据整合以及可视化</p>
+            <a href="<?= Yii::getAlias('@web') ?>/data/team/lfy.zip" class="download-button" download>刘芳宜的个人作业</a>
+        </div>
+
 
         <div class="team">
             <h2>Meet the Team</h2>
             <div class="team-member">
                 <img src="<?= Yii::getAlias('@web') ?>/assets/images/背景图片2.jpg" alt="Team Member">
-                <span>Jane Doe</span>
-                <p>Founder & CEO</p>
-                <p>Jane is a film enthusiast and entrepreneur dedicated to creating the best movie review platform.</p>
+                <span>胡雨欣</span>
+                <!-- <p>Founder & CEO</p> -->
+                <p>负责后端整体框架</p>
+                <a href="<?= Yii::getAlias('@web') ?>/data/team/hyx.zip" class="download-button" download>胡雨欣的个人作业</a>
             </div>
             <div class="team-member">
                 <img src="<?= Yii::getAlias('@web') ?>/assets/images/背景图片2.jpg" alt="Team Member">
-                <span>John Smith</span>
-                <p>CTO</p>
-                <p>John is the technical genius behind the platform, ensuring a seamless user experience.</p>
+                <span>高玉格</span>
+                <!-- <p>CTO</p> -->
+                <p>负责前端后端评论功能</p>
+                <a href="<?= Yii::getAlias('@web') ?>/data/team/gyg.zip" class="download-button" download>高玉格的个人作业</a>
             </div>
             <div class="team-member">
                 <img src="<?= Yii::getAlias('@web') ?>/assets/images/背景图片3.jpg" alt="Team Member">
-                <span>Mary Johnson</span>
-                <p>Head of Design</p>
-                <p>Mary brings the platform to life with her innovative and user-friendly designs.</p>
+                <span>庞艾语</span>
+                <!-- <p>负责前端搜索交互</p> -->
+                <p>负责前端搜索交互</p>
+                <a href="<?= Yii::getAlias('@web') ?>/data/team/pay.zip" class="download-button" download>庞艾语的个人作业</a>
             </div>
         </div>
     </div>

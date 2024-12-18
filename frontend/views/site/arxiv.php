@@ -53,7 +53,6 @@ $this->registerCssFile('@web/css/style.css'); // 可选，用于加载外部 CSS
 <?php endif; ?>
 
 <?php
-// 注册样式
 $this->registerCss('
  body {
         background-image: url("' . Yii::getAlias('@web/images/background.jpg') . '");
@@ -80,18 +79,20 @@ $this->registerCss('
         display: inline-block;
     }
     .paper-box {
+        height: 450px; /* 统一高度 */
         padding: 15px;
         border: 1px solid #ddd;
         border-radius: 5px;
         margin-bottom: 20px;
         background-color: #f9f9f9;
-        min-height: 400px; /* 调整框的最小高度 */
         display: flex;
         flex-direction: column;
         justify-content: space-between;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* 添加阴影美化 */
     }
     .paper-box p {
         margin: 5px 0;
+        flex: 1; /* 自动填充空间 */
     }
     .row {
         margin-top: 20px;
