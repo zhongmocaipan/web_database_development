@@ -13,6 +13,7 @@ use backend\models\ToolComment;
 use backend\models\ArxivPaper;
 use backend\models\Comment;
 use yii\data\Pagination;
+use yii\web\NotFoundHttpException; // 引入 NotFoundHttpException 类
 
 class CommentController extends Controller
 {
@@ -125,17 +126,22 @@ class CommentController extends Controller
     }
                     
 
-    // 删除评论
     public function actionDeleteComment($id)
     {
         $comment = ToolComment::findOne($id);
         if ($comment) {
+            $toolName = $comment->tool_name; // 使用 tool_name 替代 ai_tool_id
             $comment->delete();
+    
+            // 返回到评论页面
+            return $this->redirect(['comment/view-comments', 'toolName' => $toolName]);
         }
-
-        // 返回到评论页面
-        return $this->redirect(['comment/view-comments', 'id' => $comment->ai_tool_id]);
+    
+        // 如果 $comment 不存在，添加提示并跳转到评论选择页面
+        Yii::$app->session->setFlash('error', '评论未找到或已被删除。');
+        return $this->redirect(['comment/select-type']);
     }
+    
 
     // 更新评论页面
     public function actionUpdateComment($id)
@@ -157,18 +163,46 @@ class CommentController extends Controller
     }
 
 
+    // public function actionUpdatePaperComment($id)
+    // {
+    //     // 获取需要更新的 paper
+    //     $comment = Comment::findOne($id);
+        
+    //     if (!$comment) {
+    //         throw new NotFoundHttpException('The requested paper does not exist.');
+    //     }
+    
+    //     // 创建表单提交的模型实例
+    //     if ($comment->load(Yii::$app->request->post()) && $comment->save()) {
+    //         // 保存成功后跳转到显示评论的页面（可以根据需求跳转到其他页面）
+    //         return $this->redirect(['view-paper-comments', 'id' => $paper->id]);
+    //     }
+    
+    //     // 渲染更新页面
+    //     return $this->render('update-paper-comment', [
+    //         'comment' => $comment,
+    //     ]);
+    // }
     public function actionUpdatePaperComment($id)
     {
-        // 获取需要更新的 paper
+        // 获取需要更新的评论
         $comment = Comment::findOne($id);
         
         if (!$comment) {
-            throw new NotFoundHttpException('The requested paper does not exist.');
+            throw new NotFoundHttpException('The requested comment does not exist.');
+        }
+    
+        // 获取与评论关联的论文信息
+        $paper = ArxivPaper::findOne($comment->paper_id); // 根据评论中的 paper_id 获取论文信息
+        if (!$paper) {
+            throw new NotFoundHttpException('The related paper does not exist.');
         }
     
         // 创建表单提交的模型实例
         if ($comment->load(Yii::$app->request->post()) && $comment->save()) {
-            // 保存成功后跳转到显示评论的页面（可以根据需求跳转到其他页面）
+            // 保存成功后设置提示信息
+            Yii::$app->session->setFlash('success', '评论修改成功！');
+            // 跳转到显示评论的页面
             return $this->redirect(['view-paper-comments', 'id' => $paper->id]);
         }
     
@@ -177,6 +211,9 @@ class CommentController extends Controller
             'comment' => $comment,
         ]);
     }
+    
+    
+
     
     public function actionDeletePaperComment($id)
     {
