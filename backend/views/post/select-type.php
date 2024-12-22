@@ -1,9 +1,14 @@
 <?php
+/*
+ * Team：LOVEYII
+ * Coding By：胡雨欣 2212117
+ * 后端选择类型查看页面
+*/
 /* @var $this yii\web\View */
 
-$this->title = 'Select Like Type';
+$this->title = 'Select  Like/Dislike Type';
 ?>
-<h1 class="text-center mb-5">Select Like Type</h1>
+<h1 class="text-center mb-5">Select  Like/Dislike  Type</h1>
 
 <!-- 使用Flexbox并限制最大宽度来确保页面只在中间部分显示 -->
 <div class="container d-flex justify-content-center align-items-center" style="max-width: 800px; margin: 0 auto; min-height: 100vh;">
@@ -12,11 +17,11 @@ $this->title = 'Select Like Type';
         <div class="col-md-6 col-lg-6 mb-4">
             <div class="card shadow-lg border-0">
                 <div class="card-header text-white" style="background: #007bff; border-radius: 10px;">
-                    <h5>AI Tool Likes</h5>
+                    <h5>AI Tool Likes/Dislikes</h5>
                 </div>
                 <div class="card-body">
-                    <p style="color: white;">View and manage likes for AI tools.</p> <!-- 修改字体颜色为白色 -->
-                    <a href="<?= \yii\helpers\Url::to(['post/ai-tool']) ?>" class="btn btn-primary btn-block hover-btn">Go to AI Tool Likes</a>
+                    <p style="color: white; font-size: 18px;">View and manage likes/dislikes for AI tools.</p>
+                    <a href="<?= \yii\helpers\Url::to(['post/ai-tool']) ?>" class="btn btn-primary btn-block hover-btn">Go to AI Tool Likes/Dislikes</a>
                 </div>
             </div>
         </div>
@@ -25,11 +30,12 @@ $this->title = 'Select Like Type';
         <div class="col-md-6 col-lg-6 mb-4">
             <div class="card shadow-lg border-0">
                 <div class="card-header text-white" style="background: #28a745; border-radius: 10px;">
-                    <h5>Paper Likes</h5>
+                    <h5>Paper Likes/Dislikes</h5>
                 </div>
                 <div class="card-body">
-                    <p style="color: white;">View and manage likes for papers.</p> <!-- 修改字体颜色为白色 -->
-                    <a href="<?= \yii\helpers\Url::to(['post/paper']) ?>" class="btn btn-success btn-block hover-btn">Go to Paper Likes</a>
+                    <p style="color: white; font-size: 18px;">View and manage likes/dislikes for Papers.</p>
+
+                    <a href="<?= \yii\helpers\Url::to(['post/paper']) ?>" class="btn btn-success btn-block hover-btn">Go to Paper Likes/Dislikes</a>
                 </div>
             </div>
         </div>

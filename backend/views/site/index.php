@@ -1,5 +1,9 @@
 <?php
-
+/*
+ * Team：LOVEYII
+ * Coding By：胡雨欣 2212117 刘芳宜 2213925
+ * 后端主页面
+*/
 /* @var $this yii\web\View */
 
 $this->title = 'Admin Dashboard';
@@ -34,14 +38,14 @@ $this->title = 'Admin Dashboard';
                     </li>
 
                     <li class="nav-item">
-                        <a class="nav-link" href="<?= \yii\helpers\Url::to(['post/select-type']) ?>">Likes Management</a>
+                        <a class="nav-link" href="<?= \yii\helpers\Url::to(['post/select-type']) ?>">Likes/Dislikes Management</a>
                         <!-- 子菜单 -->
                         <ul class="nav flex-column ml-3">
                             <li class="nav-item">
-                                <a class="nav-link" href="<?= \yii\helpers\Url::to(['post/ai-tool']) ?>">AI Tool Likes</a>
+                                <a class="nav-link" href="<?= \yii\helpers\Url::to(['post/ai-tool']) ?>">AI Tool Likes/Dislikes</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="<?= \yii\helpers\Url::to(['post/paper']) ?>">Paper Likes</a>
+                                <a class="nav-link" href="<?= \yii\helpers\Url::to(['post/paper']) ?>">Paper Likes/Dislikes</a>
                             </li>
                         </ul>
                     </li>
@@ -50,7 +54,12 @@ $this->title = 'Admin Dashboard';
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="<?= \yii\helpers\Url::to(['site/paper-management']) ?>">Paper Management</a>
-                        <a class="nav-link" href="<?= \yii\helpers\Url::to(['site/tool-management']) ?>">AI Tool Management</a>                    </li>
+                        <a class="nav-link" href="<?= \yii\helpers\Url::to(['site/tool-management']) ?>">AI Tool Management</a>                    
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?= \yii\helpers\Url::to(['members/member']) ?>">Member Management</a>
+                    </li>
+
                 </ul>
             </div>
 
@@ -109,11 +118,11 @@ $this->title = 'Admin Dashboard';
                     <div class="col-md-4">
                         <div class="card">
                             <div class="card-header">
-                                Likes Management
+                                Likes/Dislikes Management
                             </div>
                             <div class="card-body">
-                                <p>Manage the number of likes for each post. Reset, increase, or decrease likes as needed.</p>
-                                <a href="<?= \yii\helpers\Url::to(['post/select-type']) ?>" class="btn btn-primary">Go to Likes Management</a>
+                                <p>Manage the number of likes/dislikes for each post. Reset, increase, or decrease likes/dislikes as needed.</p>
+                                <a href="<?= \yii\helpers\Url::to(['post/select-type']) ?>" class="btn btn-primary">Go to Likes/Dislikes Management</a>
                             </div>
                         </div>
                     </div>

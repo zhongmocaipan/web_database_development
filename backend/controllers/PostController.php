@@ -1,12 +1,19 @@
 <?php
+/*
+ * Team：LOVEYII
+ * Coding By：胡雨欣 2212117 庞艾语 2211581
+ * 后端电赞控制器
+*/
 namespace backend\controllers;
 
 use Yii;
 use yii\web\Controller;
 use backend\models\AllAiTool;
 use backend\models\ToolLike;
+use backend\models\ToolDislike;
 use backend\models\ArxivPaper;
 use backend\models\PaperLike;
+use backend\models\PaperDislike;
 use backend\models\AiToolSearch;
 use yii\data\Pagination;
 class PostController extends Controller
@@ -77,6 +84,40 @@ class PostController extends Controller
                 'pagination' => $pagination,
                 'tool' => $tool,
                 'totalLikes' => $totalLikes,  // 传递总点赞数
+            ]);
+        }
+        public function actionViewDislikes($toolName)
+        {
+            // 根据 AI Tool Name 获取 AI 工具信息
+            $tool = AllAiTool::find()->where(['AI Tool Name' => $toolName])->one();
+        
+            if (!$tool) {
+                throw new \yii\web\NotFoundHttpException('The requested tool does not exist.');
+            }
+        
+            // 查询点赞数据
+            $query = ToolDislike::find()->where(['tool_name' => $tool->getAttribute('AI Tool Name')])->orderBy(['created_at' => SORT_DESC]);
+        
+            // 设置分页
+            $pagination = new Pagination([
+                'defaultPageSize' => 10,
+                'totalCount' => $query->count(),
+            ]);
+        
+            // 获取分页后的数据
+            $toolDislikes = $query->offset($pagination->offset)
+                               ->limit($pagination->limit)
+                               ->all();
+        
+            // 获取总点赞数
+            $totalDislikes = $query->count();
+        
+            // 渲染视图并传递数据
+            return $this->render('view-dislikes', [
+                'toolDislikes' => $toolDislikes,
+                'pagination' => $pagination,
+                'tool' => $tool,
+                'totalDislikes' => $totalDislikes,  // 传递总点赞数
             ]);
         }
         
@@ -165,4 +206,65 @@ public function actionDeleteLike($id)
     return $this->redirect(['view-likes', 'toolName' => $like->tool->getAttribute('AI Tool Name')]);
 }
 
+public function actionViewPaperDislikes($id)
+    {
+        // 根据 Paper ID 获取对应的 Paper 信息
+        $paper = ArxivPaper::findOne($id);
+    
+        if (!$paper) {
+            throw new \yii\web\NotFoundHttpException('The requested paper does not exist.');
+        }
+    
+        // 查询该论文的所有点赞记录
+        $query = PaperDislike::find()->where(['paper_id' => $id])->orderBy(['created_at' => SORT_DESC]);
+    
+        // 分页设置
+        $pagination = new Pagination([
+            'defaultPageSize' => 10,  // 每页显示 10 条记录
+            'totalCount' => $query->count(),
+        ]);
+    
+        // 获取分页后的点赞数据
+        $paperDislikes = $query->offset($pagination->offset)
+                            ->limit($pagination->limit)
+                            ->all();
+    
+        // 获取总点赞数
+        $totalDislikes = $query->count();
+    
+        // 渲染视图并传递数据
+        return $this->render('view-paper-dislikes', [
+            'paperDislikes' => $paperDislikes,
+            'pagination' => $pagination,
+            'paper' => $paper,
+            'totalDislikes' => $totalDislikes,
+        ]);
+    }
+
+    public function actionDeletePaperDislike($id)
+{
+    $paperDislike = PaperDislike::findOne($id);
+
+    if (!$paperDislike) {
+        throw new \yii\web\NotFoundHttpException('The requested dislike does not exist.');
+    }
+
+    // 删除该点赞记录
+    if ($paperDislike->delete()) {
+        Yii::$app->session->setFlash('success', 'Dislike has been deleted.');
+    } else {
+        Yii::$app->session->setFlash('error', 'Failed to delete dislike.');
+    }
+
+    return $this->redirect(['view-paper-dislikes', 'id' => $paperDislike->paper_id]);
+}
+public function actionDeleteDisike($id)
+{
+    $dislike = ToolDislike::findOne($id);
+    if ($dislike) {
+        $dislike->delete();
+    }
+
+    return $this->redirect(['view-dislikes', 'toolName' => $dislike->tool->getAttribute('AI Tool Name')]);
+}
 };

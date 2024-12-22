@@ -1,4 +1,9 @@
 <?php
+/*
+ * Team：LOVEYII
+ * Coding By：胡雨欣 2212117 庞艾语 2211581
+ * 后端查看tool页面
+*/
 /* @var $this yii\web\View */
 /* @var $tools backend\models\AllAiTool[] */
 /* @var $pagination yii\data\Pagination */
@@ -9,9 +14,7 @@ use yii\widgets\LinkPager;
 
 $this->title = 'AI Tool Likes';
 ?>
-
 <h1><?= Html::encode($this->title) ?></h1>
-
 
 <!-- AI Tool 列表 -->
 <table class="table table-striped">
@@ -34,8 +37,15 @@ $this->title = 'AI Tool Likes';
                     <td><?= Html::encode($tool->getAttribute('AI Tool Name')) ?></td>
                     <td><?= Html::encode($tool->Description) ?></td>
                     <td>
+                        <!-- View Likes 按钮 -->
                         <?= Html::a('View Likes', ['view-likes', 'toolName' => $tool->getAttribute('AI Tool Name')], [
                             'class' => 'btn btn-primary',
+                        ]) ?>
+                    </td>
+                    <td>
+                                                <!-- View Dislikes 按钮 -->
+                        <?= Html::a('View Dislikes', ['view-dislikes', 'toolName' => $tool->getAttribute('AI Tool Name')], [
+                            'class' => 'btn btn-danger',
                         ]) ?>
                     </td>
                 </tr>

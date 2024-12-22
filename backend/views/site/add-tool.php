@@ -1,5 +1,9 @@
 <?php
-
+/*
+ * Team：LOVEYII
+ * Coding By：胡雨欣 2212117
+ * 后端增加tool页面
+*/
 /* @var $this yii\web\View */
 /* @var $model backend\models\AllAiTool */
 /* @var $form yii\widgets\ActiveForm */
@@ -30,7 +34,6 @@ $this->params['breadcrumbs'][] = $this->title;
 <?= $form->field($model, 'Review')->textInput(['maxlength' => true]) ?>
 <?= $form->field($model, 'toolLink')->textInput(['maxlength' => true]) ?>
 <?= $form->field($model, 'majorCategory')->textInput(['maxlength' => true]) ?>
-
     <div class="form-group">
         <?= Html::submitButton('Add Tool', ['class' => 'btn btn-success']) ?>
     </div>

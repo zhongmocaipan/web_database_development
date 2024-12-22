@@ -1,5 +1,9 @@
 <?php
-
+/*
+ * Team：LOVEYII
+ * Coding By：胡雨欣 2212117
+ * 后端paper页面
+*/
 /* @var $this yii\web\View */
 /* @var $paper common\models\ArxivPaper */
 

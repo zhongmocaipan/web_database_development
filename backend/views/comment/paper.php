@@ -1,4 +1,9 @@
 <?php
+/*
+ * Team：LOVEYII
+ * Coding By：胡雨欣 2212117
+ * 后端评论paper页面
+*/
 /* @var $this yii\web\View */
 /* @var $papers backend\models\ArxivPaper[] */
 /* @var $pagination yii\data\Pagination */

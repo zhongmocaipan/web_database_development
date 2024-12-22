@@ -1,5 +1,11 @@
 // backend/views/user/view.php
-
+<?php
+/*
+ * Team：LOVEYII
+ * Coding By：胡雨欣 2212117
+ * 后端查看用户页面
+*/
+?>
 <h1>View User: <?= $user->username ?></h1>
 
 <p>Email: <?= $user->email ?></p>

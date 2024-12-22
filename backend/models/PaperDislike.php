@@ -1,7 +1,7 @@
 <?php
 /*
  * Team：LOVEYII
- * Coding By：胡雨欣 2212117
+ * Coding By：庞艾语 2211581
  * 后端paper点赞模型
 */
 namespace backend\models;
@@ -10,11 +10,11 @@ use Yii;
 use yii\db\ActiveRecord;
 use common\models\User;  // 引入 User 模型
 
-class PaperLike extends ActiveRecord
+class PaperDislike extends ActiveRecord
 {
     public static function tableName()
     {
-        return 'paper_likes'; // 关联到 comments 表
+        return 'paper_dislikes'; // 关联到 comments 表
     }
 
     public function rules()
