@@ -1,5 +1,9 @@
 <?php
-
+/*
+ * Team：LOVEYII
+ * Coding By：胡雨欣 2212117
+ * 后端error页面
+*/
 /* @var $this yii\web\View */
 /* @var $name string */
 /* @var $message string */

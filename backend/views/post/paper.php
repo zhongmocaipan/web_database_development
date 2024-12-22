@@ -1,4 +1,9 @@
 <?php
+/*
+ * Team：LOVEYII
+ * Coding By：胡雨欣 2212117 庞艾语 2211581
+ * 后端paper查看页面
+*/
 /* @var $this yii\web\View */
 /* @var $papers backend\models\ArxivPaper[] */
 /* @var $pagination yii\data\Pagination */
@@ -28,8 +33,10 @@ $this->title = 'Papers Management';
                 <td><?= Yii::$app->formatter->asDatetime($paper->published, 'php:Y-m-d') ?></td>
                 <td>
                     <!-- 查看评论按钮 -->
-
-                    <?= Html::a('View Likes', ['post/view-paper-likes', 'id' => $paper->id], ['class' => 'btn btn-primary']) ?>
+                    <div style="display: flex; gap: 10px;">
+                        <?= Html::a('View Likes', ['post/view-paper-likes', 'id' => $paper->id], ['class' => 'btn btn-primary']) ?>
+                        <?= Html::a('View Dislikes', ['post/view-paper-dislikes', 'id' => $paper->id], ['class' => 'btn btn-danger']) ?>
+                    </div>
                 </td>
             </tr>
         <?php endforeach; ?>

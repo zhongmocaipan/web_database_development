@@ -1,5 +1,9 @@
 <?php
-
+/*
+ * Team：LOVEYII
+ * Coding By：胡雨欣 2212117
+ * 后端评论模型
+*/
 namespace backend\models;
 
 use Yii;
