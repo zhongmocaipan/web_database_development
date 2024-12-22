@@ -1,6 +1,13 @@
 <?php
+/**
+ * Team:LOVEYII,NKU
+ * coding by 刘芳宜 2213925,20241218
+ * This is the main layout of frontend web.
+ */
+
 
 /* @var $this yii\web\View */
+/* @var $members array 这个数组包含从数据库中获取的成员数据 */
 
 use yii\helpers\Html;
 
@@ -18,11 +25,10 @@ $this->params['breadcrumbs'][] = $this->title;
     body {
         height: auto;
         margin: 0;
-        overflow-y: auto; /* 允许垂直滚动 */
+        overflow-y: auto;
         position: relative;
     }
 
-    /* 背景图片轮播 */
     .background-slideshow {
         position: absolute;
         top: 0;
@@ -58,7 +64,7 @@ $this->params['breadcrumbs'][] = $this->title;
         z-index: 2;
         text-align: center;
         padding: 20px;
-        margin-top: 20px; /* 适当调整顶部间距 */
+        margin-top: 20px;
     }
 
     .about-container {
@@ -72,7 +78,6 @@ $this->params['breadcrumbs'][] = $this->title;
         font-size: 12px;
     }
 
-    /* Leader 部分样式 */
     .leader-section {
         margin-bottom: 30px;
         text-align: center;
@@ -81,7 +86,7 @@ $this->params['breadcrumbs'][] = $this->title;
     .leader-section img {
         width: 100px;
         height: 100px;
-        border-radius: 50%; 
+        border-radius: 50%;
         margin-bottom: 10px;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
     }
@@ -151,7 +156,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     .features {
         margin-top: 30px;
-        text-align: center; 
+        text-align: center;
     }
 
     .features h2 {
@@ -181,7 +186,6 @@ $this->params['breadcrumbs'][] = $this->title;
         margin-right: 10px;
     }
 
-    /* 下载按钮样式 */
     .download-button {
         display: inline-block;
         margin-top: 10px;
@@ -202,41 +206,32 @@ $this->params['breadcrumbs'][] = $this->title;
     <div class="about-container">
         <!-- Leader 介绍 -->
         <h1><?= Html::encode($this->title) ?></h1>
-        <p>
-            小组致力于做出ai相关的网页以发现更多的ai交流爱好者研究者。
-        </p>
+        <p>小组致力于做出ai相关的网页以发现更多的ai交流爱好者研究者。</p>
 
         <div class="leader-section">
             <img src="<?= Yii::getAlias('@web') ?>/assets/images/背景图片1.jpg" alt="Leader Photo">
-            <h2>Leader: 刘芳宜</h2>
-            <p>负责前端整体框架和所有数据整合以及可视化</p>
-            <a href="<?= Yii::getAlias('@web') ?>/data/team/lfy.zip" class="download-button" download>刘芳宜的个人作业</a>
+            <h2>Leader: <?= Html::encode($leader->membername) ?></h2> <!-- 显示数据库中的Leader姓名 -->
+            <p><?= Html::encode($leader->zuzhangorduiyuan) ?></p> <!-- 显示 Leader 的分工 -->
+            <p><strong>负责：</strong> <?= Html::encode($leader->memberhomework) ?></p> <!-- 显示 Leader 的作业 -->
+            <!-- 生成下载链接，指向 data/team 文件夹下的 ZIP 文件 -->
+            <a href="<?= Yii::getAlias('@web') ?>/data/personal/<?= Html::encode($leader->memberhomework) ?>.zip" class="download-button" download>下载个人作业</a>
         </div>
-
 
         <div class="team">
             <h2>Meet the Team</h2>
-            <div class="team-member">
-                <img src="<?= Yii::getAlias('@web') ?>/assets/images/背景图片2.jpg" alt="Team Member">
-                <span>胡雨欣</span>
-                <!-- <p>Founder & CEO</p> -->
-                <p>负责后端整体框架</p>
-                <a href="<?= Yii::getAlias('@web') ?>/data/team/hyx.zip" class="download-button" download>胡雨欣的个人作业</a>
-            </div>
-            <div class="team-member">
-                <img src="<?= Yii::getAlias('@web') ?>/assets/images/背景图片2.jpg" alt="Team Member">
-                <span>高玉格</span>
-                <!-- <p>CTO</p> -->
-                <p>负责前端后端评论功能</p>
-                <a href="<?= Yii::getAlias('@web') ?>/data/team/gyg.zip" class="download-button" download>高玉格的个人作业</a>
-            </div>
-            <div class="team-member">
-                <img src="<?= Yii::getAlias('@web') ?>/assets/images/背景图片3.jpg" alt="Team Member">
-                <span>庞艾语</span>
-                <!-- <p>负责前端搜索交互</p> -->
-                <p>负责前端搜索交互</p>
-                <a href="<?= Yii::getAlias('@web') ?>/data/team/pay.zip" class="download-button" download>庞艾语的个人作业</a>
-            </div>
+
+            <?php foreach ($members as $member): ?>
+                <!-- 检查当前成员是否为Leader，如果是则跳过 -->
+                <?php if ($member->zuzhangorduiyuan === 'leader') continue; ?>
+                <div class="team-member">
+                    <img src="<?= Yii::getAlias('@web') ?>/assets/images/背景图片2.jpg" alt="Team Member">
+                    <span><?= Html::encode($member->membername) ?> ✔</span> <!-- 显示数据库中的姓名并添加符号 -->
+                    <p><?= Html::encode($member->zuzhangorduiyuan) ?></p> <!-- 显示分工部分 -->
+                    <p><strong>负责：</strong> <?= Html::encode($member->memberhomework) ?></p> <!-- 显示作业 -->
+                    <!-- 生成下载链接，指向 data/team 文件夹下的 ZIP 文件 -->
+                    <a href="<?= Yii::getAlias('@web') ?>/data/personal/<?= Html::encode($member->memberhomework) ?>.zip" class="download-button" download>下载个人作业</a>
+                </div>
+            <?php endforeach; ?>
         </div>
     </div>
 </div>

@@ -1,4 +1,9 @@
 <?php
+/**
+ * Team:LOVEYII,NKU
+ * coding by 高玉格 2213925,20241218 庞艾语2211581
+ * This is the main layout of frontend web.
+ */
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 $this->registerCssFile("https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css");  // 引入 jQuery UI 样式
@@ -23,12 +28,11 @@ $this->registerJsFile("https://code.jquery.com/ui/1.12.1/jquery-ui.min.js", ['de
 <!-- 评论区 -->
 <?php if (!empty($comments)): ?>
     <?php foreach ($comments as $comment): ?>
-        <div class="comment-box style="background-color: rgba(249, 249, 249, 0.8);">
+        <div class="comment-box" style="background-color: rgba(249, 249, 249, 0.8);">
             <p><strong>User:</strong> <?= Html::encode($comment->user->username) ?></p>
             <p><strong>Comment:</strong> <?= Html::encode($comment->content) ?></p>
             <p><strong>Posted at:</strong> <?= date('Y-m-d H:i:s', $comment->created_at) ?></p>
         </div>
-        
     <?php endforeach; ?>
 <?php else: ?>
     <p>No comments yet.</p>
@@ -42,12 +46,18 @@ $paperId = $paper['id'];
 
 // 获取点赞数
 $likesCount = Yii::$app->db->createCommand('SELECT COUNT(*) FROM paper_likes WHERE paper_id = :paper_id', [':paper_id' => $paperId])->queryScalar();
+
+// 获取点踩数
+$dislikesCount = Yii::$app->db->createCommand('SELECT COUNT(*) FROM paper_dislikes WHERE paper_id = :paper_id', [':paper_id' => $paperId])->queryScalar();
 ?>
 
 <p><strong>Likes:</strong> <span id="like-count"><?= $likesCount ?></span></p>
+<p><strong>Dislikes:</strong> <span id="dislike-count"><?= $dislikesCount ?></span></p>
 
 <!-- 点赞按钮 -->
 <button id="like-button" class="btn btn-success">Like</button>
+<!-- 点踩按钮 -->
+<button id="dislike-button" class="btn btn-primary">Dislike</button>
 <hr>
 
 <h2>Post a Comment</h2>
@@ -72,11 +82,8 @@ $likesCount = Yii::$app->db->createCommand('SELECT COUNT(*) FROM paper_likes WHE
 
 <?php ActiveForm::end(); ?>
 
-
-
 <!-- 弹窗反馈 -->
 <div id="successDialog" title="Success" style="display:none;">
-    
     <div>Your comment has been successfully posted!</div>
 </div>
 
@@ -89,11 +96,9 @@ $script = <<<JS
         modal: true,      // 使用模态窗口，阻止其他操作
         buttons: {
             'OK': function() {
-                //$(this).dialog('close');
                 location.reload();  // 页面刷新
             }
         }
-        
     });
 
     $('#comment-form').on('beforeSubmit', function(e) {
@@ -118,97 +123,70 @@ $script = <<<JS
     });
 
     $(document).ready(function(){
-    // 点赞操作
-    $('#like-button').on('click', function() {
-        var paperId = '$paperId';  // 获取当前工具名称
-        
-     
-        
-        // 发送点赞请求到后端
-        $.ajax({
-            url: '/site/like-paper',  // 后端点赞接口
-            type: 'POST',
-            data: { paper_id: paperId },
-            success: function(response) {
-                console.log(response);
-                console.log('Paper ID:', paperId);
-                if (response.success) {
-                    alert('Thank for your like!');
-                    // 更新点赞数
-                    $('#like-count').text(response.likes_count);
-                    // 切换按钮颜色
-                    $('#like-button').addClass('liked');
-                } else {
-                    alert(response.message);  // 点赞失败的提示
+        // 点赞操作
+        $('#like-button').on('click', function() {
+            var paperId = '$paperId';  // 获取当前论文 ID
+            
+            // 发送点赞请求到后端
+            $.ajax({
+                url: '/site/like-paper',  // 后端点赞接口
+                type: 'POST',
+                data: { paper_id: paperId },
+                success: function(response) {
+                    if (response.success) {
+                        if (response.message === 'Like added.') {
+                            alert('Thank you for your like!');
+                            $('#like-button').addClass('liked');  // 添加点赞样式
+                        } else if (response.message === 'Like removed.') {
+                            alert('The like has been canceled.');
+                            $('#like-button').removeClass('liked');  // 移除点赞样式
+                        }
+                        // 更新点赞数
+                        $('#like-count').text(response.likes_count);
+                    } else {
+                        alert(response.message);  // 点赞失败的提示
+                    }
+                },
+                error: function() {
+                    alert('Error occurred while liking the paper.');
                 }
-            },
-            error: function() {
-                alert('Error occurred while liking the paper.');
-            }
+            });
+        });
+
+        // 点踩操作
+        $('#dislike-button').on('click', function() {
+            var paperId = '$paperId';  // 获取当前论文 ID
+            
+            // 发送点踩请求到后端
+            $.ajax({
+                url: '/site/dislike-paper',  // 后端点踩接口
+                type: 'POST',
+                data: { paper_id: paperId },
+                success: function(response) {
+                    if (response.success) {
+                        if (response.message === 'Dislike added.') {
+                            alert('You have disliked this paper.');
+                            $('#dislike-button').addClass('disliked');  // 添加点踩样式
+                        } else if (response.message === 'Dislike removed.') {
+                            alert('The dislike has been canceled.');
+                            $('#dislike-button').removeClass('disliked');  // 移除点踩样式
+                        }
+                        // 更新点踩数
+                        $('#dislike-count').text(response.dislikes_count);
+                    } else {
+                        alert(response.message);  // 点踩失败的提示
+                    }
+                },
+                error: function() {
+                    alert('Error occurred while disliking the paper.');
+                }
+            });
         });
     });
-});
 JS;
 $this->registerJs($script);
 
 ?>
-
-<?php
-$this->registerCss('
-    .ui-dialog-titlebar-close {
-        background-color: transparent !important; /* 背景透明 */
-        color: transparent !important;                  /* 设置关闭按钮字体颜色 */
-        border: none !important; 
-        
-    }
-
-    /* 弹窗背景、阴影和圆角 */
-    .ui-dialog.ui-widget-content {
-        background-color: white !important;  /* 背景色为白色 */
-        border-radius: 15px !important;  /* 增加圆角 */
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important; /* 细腻的阴影效果 */
-        padding: none !important;  /* 内边距增大，防止内容紧贴边框 */
-        border: none !important;  /* 去掉边框 */
-    }
-
-    /* 弹窗标题栏背景和文本样式 */
-    .ui-dialog-titlebar {
-        background: linear-gradient(145deg, #81c7e0, #5fa8d3) !important;  /* 淡蓝色渐变背景 */
-        color: white !important;  /* 文字颜色 */
-        font-size: 20px !important;  /* 字体大小 */
-        font-weight: bold !important;  /* 加粗 */
-        text-align: center !important;  /* 标题居中 */
-        padding: no !important;  /* 增加标题栏的内边距 */
-        border-top-left-radius: 12px !important;  /* 顶部左边圆角 */
-        border-top-right-radius: 12px !important;  /* 顶部右边圆角 */
-        border: none !important;  /* 去掉默认的边框 */
-    }
-     
-
-    /* 弹窗按钮样式 */
-    .ui-dialog-buttonpane button {
-        background: linear-gradient(145deg, #81c7e0, #5fa8d3) !important;  /* 按钮渐变背景 */
-        color: white !important;  /* 按钮文字颜色 */
-        border: none !important;  /* 去掉边框 */
-        padding: 10px 20px !important;  /* 按钮内边距 */
-        font-size: 16px !important;  /* 字体大小 */
-        border-radius: 8px !important;  /* 圆角按钮 */
-        cursor: pointer !important;  /* 鼠标悬停为手型 */
-        transition: background-color 0.3s ease, transform 0.2s ease !important;  /* 平滑过渡效果 */
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15) !important;  /* 添加阴影 */
-    }
-
-    /* 按钮悬浮效果 */
-    .ui-dialog-buttonpane button:hover {
-        background: linear-gradient(145deg, #5fa8d3, #81c7e0) !important;  /* 悬浮时背景颜色反转 */
-        transform: translateY(-2px) !important;  /* 按钮悬浮时上移 */
-        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2) !important;  /* 悬浮时增加阴影 */
-    }
-     
-');
-
-?>
-
 
 <?php
 $this->registerCss('
@@ -230,7 +208,7 @@ $this->registerCss('
         border-radius: 5px;                           /* 圆角 */
     }
 
-   #like-button {
+    #like-button {
         background-color: transparent; /* 设置按钮背景为透明 */
         border: 2px solid white;  /* 设置白色边框 */
         padding: 10px 20px;  /* 增加内边距 */
@@ -257,13 +235,39 @@ $this->registerCss('
         transform: scale(0.98);  /* 鼠标按下时，按钮稍微缩小 */
     }
 
+    #dislike-button {
+        background-color: transparent; /* 设置按钮背景为透明 */
+        border: 2px solid blue;  /* 设置蓝色边框 */
+        padding: 10px 20px;  /* 增加内边距 */
+        font-size: 16px;  /* 设置字体大小 */
+        cursor: pointer;  /* 鼠标悬停时显示手形光标 */
+        border-radius: 25px;  /* 设置圆角效果 */
+        transition: all 0.3s ease;  /* 设置平滑过渡效果 */
+        outline: none;  /* 去除点击后的边框 */
+        color: blue;  /* 设置文字颜色为蓝色 */
+    }
+
+    #dislike-button.disliked {
+        background-color: blue; /* 点踩后的背景色为蓝色 */
+        border-color: blue; /* 点踩后边框变成蓝色 */
+        color: white;  /* 保持文字为白色 */
+    }
+    
+    #dislike-button:hover {
+        background-color: rgba(0, 0, 255, 0.1); /* 鼠标悬停时，背景变为半透明蓝色 */
+        transform: scale(1.05);  /* 鼠标悬停时，按钮稍微变大 */
+    }
+
+    #dislike-button:active {
+        transform: scale(0.98);  /* 鼠标按下时，按钮稍微缩小 */
+    }
+
     p {
         font-size: 16px;  /* 设置整个页面所有 p 标签的字体大小 */
         line-height: 1.6; /* 设置行高，增加文本的可读性 */
         color: rgba(255, 255, 255, 0.9); /* 设置字体颜色为稍透明的白色 */
     }
     
-
     /* 修改评论输入框的外观 */
     #comment-form textarea {
         width: 100%;  /* 让输入框填满容器 */
@@ -272,11 +276,10 @@ $this->registerCss('
         border: 1px solid #ddd;  /* 边框 */
         border-radius: 8px;  /* 圆角效果 */
         background-color: rgba(255, 255, 255, 0.3);  /* 背景颜色和透明度 */
-        color: #333;  /* 字体颜色 */
+        color: white;  /* 字体颜色 */
         font-size: 16px;  /* 字体大小 */
         resize: vertical;  /* 允许上下调整大小 */
         box-sizing: border-box;  /* 包括内边距在内的总宽度 */
-        margin-left: +10px;
     }
 
     /* 提示文字的颜色 */
@@ -299,7 +302,6 @@ $this->registerCss('
         box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.2), inset 1px 1px 3px rgba(255, 255, 255, 0.3);  /* 增加外部阴影和内阴影 */
         transition: all 0.3s ease; /* 按钮的过渡效果，平滑过渡所有变化 */
         outline: none;  /* 去掉点击后的边框 */
-        margin-left: +10px;
     }
 
     .form-group button:hover {
@@ -307,14 +309,6 @@ $this->registerCss('
         transform: translateY(-3px); /* 悬停时稍微上移 */
         box-shadow: 3px 6px 15px rgba(0, 0, 0, 0.25);  /* 悬停时增加更强的阴影 */
     }
-
-    
-
-
-    #comment-form textarea {
-        color: white;  /* 设置输入文字颜色为深灰色 */
-    }
-
 
     .ui-dialog-titlebar-close {
         background-color: transparent !important; /* 背景透明 */
@@ -325,7 +319,6 @@ $this->registerCss('
     #successDialog div {
         font-size: 16px;      /* 设置字体大小 */
         color: #333;          /* 设置文字颜色为深灰色 */
-            /* 让文字加粗，增加可读性 */
     }
 ');
 ?>

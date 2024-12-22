@@ -1,5 +1,9 @@
 <?php
-
+/**
+ * Team:LOVEYII,NKU
+ * coding by 刘芳宜 2213925,20241218
+ * This is the main layout of frontend web.
+ */
 /* @var $this yii\web\View */
 /* @var $form yii\widgets\ActiveForm */
 /* @var $model frontend\models\ContactForm */

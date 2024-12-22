@@ -2,17 +2,23 @@
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use yii\helpers\Url;
-
+/**
+ * Team:LOVEYII,NKU
+ * coding by 刘芳宜 2213925,20241218 庞艾语 2211581，20241220
+ * This is the main layout of frontend web.
+ */
 // 连接数据库
 $connection = Yii::$app->db;
 
 // 获取用户输入的日期
-$searchDate = Yii::$app->request->get('date', '');
+$startDate = Yii::$app->request->get('start_date', '');
+$endDate = Yii::$app->request->get('end_date', '');
 
 // 根据日期查询 arxiv_papers 表
-if ($searchDate) {
-    $arxivPapers = $connection->createCommand('SELECT * FROM arxiv_papers WHERE published = :date')
-        ->bindValue(':date', $searchDate)
+if ($startDate && $endDate) {
+    $arxivPapers = $connection->createCommand('SELECT * FROM arxiv_papers WHERE published BETWEEN :start_date AND :end_date')
+        ->bindValue(':start_date', $startDate)
+        ->bindValue(':end_date', $endDate)
         ->queryAll();
 } else {
     $arxivPapers = $connection->createCommand('SELECT * FROM arxiv_papers')->queryAll();
@@ -21,53 +27,60 @@ if ($searchDate) {
 $this->registerCssFile('@web/css/style.css');  // 引入样式文件
 ?>
 
-<h1>Arxiv Papers</h1>
+<h1>AI 论文列表</h1>
 
-<!-- 日期检索框 -->
+<!-- 日期检索表单 -->
 <div class="search-bar">
     <?php $form = ActiveForm::begin([
         'method' => 'get',
-        'action' => Url::to(['site/arxiv']),
+        'action' => Url::to(['site/arxiv']), // 指向当前路由
         'options' => ['class' => 'form-inline'],
     ]); ?>
-    <?= Html::input('date', 'date', $searchDate, ['class' => 'form-control', 'placeholder' => 'Select date']) ?>
-    <?= Html::submitButton('Search by Date', ['class' => 'btn btn-primary']) ?>
+    <label for="start_date" style="color: white;">Start Date:</label>
+    <?= Html::input('date', 'start_date', $startDate, [
+        'class' => 'form-control',
+        'placeholder' => 'Start Date',
+    ]) ?>
+    <label for="end_date" style="color: white;">End Date:</label>
+    <?= Html::input('date', 'end_date', $endDate, [
+        'class' => 'form-control',
+        'placeholder' => 'End Date',
+    ]) ?>
+    <?= Html::submitButton('Search', ['class' => 'btn btn-primary']) ?>
     <?php ActiveForm::end(); ?>
 </div>
 
-<!-- 显示所有论文 -->
-<?php if ($arxivPapers): ?>
+<!-- 显示论文列表 -->
+<?php if (!empty($arxivPapers)): ?>
     <div class="row">
         <?php foreach ($arxivPapers as $paper): ?>
             <div class="col-lg-4">
                 <div class="paper-box">
-                    <p><strong>Title:</strong> <?= Html::encode($paper['title']) ?></p>
-                    <p><strong>Abstract:</strong> 
+                    <p><strong>标题:</strong> <?= Html::encode($paper['title']) ?></p>
+                    <p><strong>摘要:</strong> 
                         <?php 
                         $abstractWords = explode(' ', $paper['abstract']);
                         $shortAbstract = implode(' ', array_slice($abstractWords, 0, 20)) . (count($abstractWords) > 20 ? '...' : '');
                         echo Html::encode($shortAbstract); 
                         ?>
                     </p>
-                    <p><strong>Published Date:</strong> <?= Html::encode($paper['published']) ?></p>
-                    <p><strong>Authors:</strong> <?= Html::encode($paper['authors']) ?></p>
+                    <p><strong>发表时间:</strong> <?= Html::encode($paper['published']) ?></p>
+                    <p><strong>作者:</strong> <?= Html::encode($paper['authors']) ?></p>
                     <p><strong>URL:</strong> <a href="<?= Html::encode($paper['url']) ?>" target="_blank"><?= Html::encode($paper['url']) ?></a></p>
                     <p>
-                        <a class="btn btn-default" href="<?= Url::to(['site/comment', 'paper_id' => $paper['id']]) ?>">Comments & Like</a>
+                        <a class="btn btn-default" href="<?= Url::to(['site/comment', 'paper_id' => $paper['id']]) ?>">Interactions</a>
                     </p>
                 </div>
             </div>
         <?php endforeach; ?>
     </div>
 <?php else: ?>
-    <p>No papers found for the selected date.</p>
+    <p>No papers available for the selected date range.</p>
 <?php endif; ?>
 
 <?php
-// 添加样式来调整页面布局和背景图片
-// 添加样式来调整页面布局和背景图片
 $this->registerCss('
-    body {
+ body {
         background-image: url("' . Yii::getAlias('@web/images/background.jpg') . '");
         background-size: cover; /* 背景图像覆盖整个页面 */
         background-attachment: fixed; /* 背景固定不滚动 */
@@ -101,14 +114,14 @@ $this->registerCss('
         display: flex;
         flex-direction: column;
         justify-content: space-between;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* 添加阴影美化 */
     }
     .paper-box p {
         margin: 5px 0;
+        flex: 1; /* 自动填充空间 */
     }
     .row {
-        margin-top: 60px; /* 给固定导航条留出空间 */
+        margin-top: 20px;
     }
 ');
-
-
 ?>

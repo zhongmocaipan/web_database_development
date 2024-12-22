@@ -1,8 +1,13 @@
 <?php 
+
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\db\Query;
-
+/**
+ * Team:LOVEYII,NKU
+ * coding by 刘芳宜 2213925,20241218 
+ * This is the main layout of frontend web.
+ */
 $this->registerCssFile('@web/css/style.css');  // 引入样式文件
 $this->registerJsFile('https://d3js.org/d3.v5.min.js', ['position' => \yii\web\View::POS_END]);  // 引入 D3.js 库
 $this->registerJsFile('https://cdn.plot.ly/plotly-latest.min.js', ['position' => \yii\web\View::POS_END]);  // 引入 Plotly.js 库

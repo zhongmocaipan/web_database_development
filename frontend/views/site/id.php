@@ -1,4 +1,9 @@
 <?php
+/**
+ * Team:LOVEYII,NKU
+ * coding by 刘芳宜 2213925,20241218 庞艾语 2211581，20241221
+ * This is the main layout of frontend web.
+ */
 /* @var $this yii\web\View */
 /* @var $tools array 数据库中所有工具的数组 */
 
@@ -9,7 +14,7 @@ use yii\widgets\ActiveForm;
 
 <h1>AI 工具列表</h1>
 
-<!-- 筛选工具状态 -->
+<!-- 搜索栏 -->
 <div class="search-bar">
     <?php $form = ActiveForm::begin([
         'method' => 'get',
@@ -24,6 +29,9 @@ use yii\widgets\ActiveForm;
         'Free Trial' => 'Free Trial',
         'Other' => 'Other'
     ], ['class' => 'form-control', 'prompt' => '选择工具状态']) ?>
+
+    <?= Html::textInput('useableFor', null, ['class' => 'form-control', 'placeholder' => '输入适用领域']) ?>
+
     <?= Html::submitButton('搜索', ['class' => 'btn btn-primary']) ?>
     <?php ActiveForm::end(); ?>
 </div>
@@ -42,7 +50,7 @@ use yii\widgets\ActiveForm;
                     <p><strong>适用领域：</strong> <?= Html::encode($tool['Useable For']) ?></p>
                     <p>
                         <!-- 添加评论按钮，点击后跳转到评论页面 -->
-                        <a class="btn btn-default" href="<?= Url::to(['site/toolcomment', 'tool_name' => $tool['AI Tool Name']]) ?>">评论 & 点赞</a>
+                        <a class="btn btn-default" href="<?= Url::to(['site/toolcomment', 'tool_name' => $tool['AI Tool Name']]) ?>">Interactions</a>
                     </p>
                 </div>
             </div>

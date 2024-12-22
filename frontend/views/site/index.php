@@ -153,35 +153,34 @@ you will find something interesting
     </div>
 
     <div class="body-content">
-    <div class="row">
-        <!-- 电影推荐部分 -->
-        <div class="col-lg-4 content-box">
-            <h2>paper about chronicle of AI</h2>
-            <p>you can find paper published</p>
-            <div class="button-container">
-                <a class="btn btn-default" href="<?= \yii\helpers\Url::to(['site/recommended']) ?>">See Recommended Papers &raquo;</a>
+        <div class="row">
+            <div class="col-lg-4 content-box">
+                <h2>AI papers finding</h2>
+                <p>you can find paper published</p>
+                <div class="button-container">
+                    <a class="btn btn-default" href="<?= \yii\helpers\Url::to(['site/recommended']) ?>">View AI related papers &raquo;</a>
+                </div>
             </div>
-        </div>
 
-        <!-- 热门电影部分 -->
-        <div class="col-lg-4 content-box">
-            <h2>World AI Ranking </h2>
-            <p>you can find World Artificial Intelligence Ranking with type</p>
-            <div class="button-container">
-                <a class="btn btn-default" href="<?= \yii\helpers\Url::to(['site/popular']) ?>">View Popular Movies &raquo;</a>
+            <!-- 排行榜部分 -->
+            <div class="col-lg-4 content-box">
+                <h2>World AI Ranking </h2>
+                <p>you can find World Artificial Intelligence Ranking with type</p>
+                <div class="button-container">
+                    <a class="btn btn-default" href="<?= \yii\helpers\Url::to(['site/popular']) ?>">View the ranking  &raquo;</a>
+                </div>
             </div>
-        </div>
 
-        <!-- 电影论坛部分 -->
-        <div class="col-lg-4 content-box">
-            <h2>AI tools finding</h2>
-            <p>you can find AI tools movie with id</p>
-            <div class="button-container">
-                <a class="btn btn-default" href="<?= \yii\helpers\Url::to(['site/forum']) ?>">Visit the Forum &raquo;</a>
+            <!-- 工具部分 -->
+            <div class="col-lg-4 content-box">
+                <h2>AI tools<br>finding</h2>
+                <p>you can find AI tools with id</p>
+                <div class="button-container">
+                    <a class="btn btn-default" href="<?= \yii\helpers\Url::to(['site/forum']) ?>">View AI related tools &raquo;</a>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
 </div>
 
