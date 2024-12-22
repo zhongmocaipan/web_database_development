@@ -1,6 +1,10 @@
 <?php
 use yii\helpers\Html;
-
+/**
+ * Team:LOVEYII,NKU
+ * coding by 刘芳宜 2213925,20241218
+ * This is the main layout of frontend web.
+ */
 /* @var $this yii\web\View */
 
 $this->title = 'Dashboard';  // 页面标题
