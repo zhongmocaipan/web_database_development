@@ -65,39 +65,11 @@ $this->title = 'Admin Dashboard';
 
             <!-- 主要内容区域 -->
             <div class="col-md-9 move-up">
-                <div class="jumbotron">
-                    <div class="container">
-                        <!-- Paper Likes 饼状图 -->
-                        <div class="col-md-6">
-                            <h3>Paper Likes</h3>
-                                <div style="width: 300px; height: 300px; margin: 0 auto;"> <!-- 调整大小 -->
-                                    <canvas id="paperLikesPieChart"></canvas>
-                                </div>
-                        </div>
-
-                        <!-- Paper Comments 饼状图 -->
-                        <div class="col-md-6">
-                            <h3>Paper Comments</h3>
-                            <div style="width: 300px; height: 300px; margin: 0 auto;"> <!-- 调整大小 -->
-                                <canvas id="paperCommentsPieChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="container">
-                        <!-- AI Tool Likes -->
-                        <div class="col-md-6">
-                            <h3>AI Tool Likes</h3>
-                            <canvas id="aiToolLikesChart"></canvas> <!-- AI Tool Likes Chart -->
-                        </div>
-
-                        <!-- AI Tool Comments -->
-                        <div class="col-md-6">
-                            <h3>AI Tool Comments</h3>
-                            <canvas id="aiToolCommentsChart"></canvas> <!-- AI Tool Comments Chart -->
-                        </div>
-                    </div>
+            <div class="jumbotron">
+                    <h1 class="display-4" >Welcome to the Admin Dashboard!</h1>
+                    <p class="lead">You can manage all the aspects of the website from here. Use the sidebar to navigate to different sections.</p>
                 </div>
+
 
                 <!-- 三个卡片并排显示 -->
                 <div class="row">
@@ -376,7 +348,6 @@ var paperCommentsChart = new Chart(ctx2, {
         margin-top: -30px; /* 向上移动内容区域 */
     }
 
-
     .card {
         margin-bottom: 20px;
     }
@@ -387,15 +358,15 @@ var paperCommentsChart = new Chart(ctx2, {
     }
 
     .jumbotron {
-    background-color: #f1f1f1; /* 原始背景色 */
-    opacity: 0.55; /* 50% 透明度 */
+        background-color: rgba(0, 0, 0, 0.3); /* 背景为黑色，70%透明 */
+        color: white; /* 字体颜色为白色 */
     width: 80%; /* 调整宽度，比如设为80%或固定px值 */
     max-width: 900px; /* 限制最大宽度 */
     height: auto; /* 根据内容自动调整高度 */
     padding: 20px; /* 减少内边距 */
     margin: 20px auto; /* 居中显示，设置外边距 */
     border-radius: 10px; /* 添加圆角效果 */
-
+  
     }
 
     .navbar {
@@ -404,6 +375,7 @@ var paperCommentsChart = new Chart(ctx2, {
 
     .nav-link.active {
         font-weight: bold;
+        color: white;
     }
 
     .nav.flex-column .nav-item .nav-link {
@@ -417,8 +389,8 @@ var paperCommentsChart = new Chart(ctx2, {
 
     /* 使柱状图之间有间隔 */
     canvas {
-        width: 300px; /* 限制宽度，例如 300px */
-        height: 300px; /* 限制高度，例如 300px */
+        width: 200px; /* 限制宽度，例如 300px */
+        height: 200px; /* 限制高度，例如 300px */
         margin-bottom: 30px;
     }
 

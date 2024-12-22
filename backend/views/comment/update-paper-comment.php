@@ -5,7 +5,7 @@
  * 后端更新paper评论页面
 */
 /* @var $this yii\web\View */
-/* @var $paper backend\models\ArxivPaper */
+/* @var $comment backend\models\Comment */
 
 use yii\widgets\ActiveForm;
 use yii\helpers\Html;
@@ -19,11 +19,10 @@ $this->params['breadcrumbs'][] = $this->title;
 
 <?php $form = ActiveForm::begin([
     'id' => 'update-paper-form',
-    'action' => ['comment/update-paper-comment', 'id' => $comment->paper_id],  // 确保正确的 action
-    'enableAjaxValidation' => false, // 不启用AJAX验证
+    'action' => ['comment/update-paper-comment', 'id' => $comment->id],  // 使用评论的主键 ID
+    'enableAjaxValidation' => false,
     'options' => ['class' => 'form-horizontal'],
 ]); ?>
-
 
     <?= $form->field($comment, 'content')->textarea(['rows' => 6, 'placeholder' => 'Update paper description here']) ?>
 
