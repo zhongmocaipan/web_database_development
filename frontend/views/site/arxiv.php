@@ -2,12 +2,14 @@
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use yii\helpers\Url;
-
-// 注册 CSS 样式
-$this->registerCssFile('@web/css/style.css'); // 可选，用于加载外部 CSS 文件
+/**
+ * Team:LOVEYII,NKU
+ * coding by 刘芳宜 2213925,20241218 庞艾语 2211581，20241220
+ * This is the main layout of frontend web.
+ */
 ?>
 
-<h1>Arxiv Papers</h1>
+<h1>AI 论文列表</h1>
 
 <!-- 日期检索表单 -->
 <div class="search-bar">
@@ -16,9 +18,15 @@ $this->registerCssFile('@web/css/style.css'); // 可选，用于加载外部 CSS
         'action' => Url::to(['site/arxiv']), // 指向当前路由
         'options' => ['class' => 'form-inline'],
     ]); ?>
-    <?= Html::input('date', 'date', $searchDate, [
+    <label for="start_date" style="color: white;">Start Date:</label>
+    <?= Html::input('date', 'start_date', $startDate, [
         'class' => 'form-control',
-        'placeholder' => 'Search by date',
+        'placeholder' => 'Start Date',
+    ]) ?>
+    <label for="end_date" style="color: white;">End Date:</label>
+    <?= Html::input('date', 'end_date', $endDate, [
+        'class' => 'form-control',
+        'placeholder' => 'End Date',
     ]) ?>
     <?= Html::submitButton('Search', ['class' => 'btn btn-primary']) ?>
     <?php ActiveForm::end(); ?>
@@ -30,19 +38,21 @@ $this->registerCssFile('@web/css/style.css'); // 可选，用于加载外部 CSS
         <?php foreach ($arxivPapers as $paper): ?>
             <div class="col-lg-4">
                 <div class="paper-box">
-                    <p><strong>Title:</strong> <?= Html::encode($paper['title']) ?></p>
-                    <p><strong>Abstract:</strong> 
-                        <?php 
-                        $abstractWords = explode(' ', $paper['abstract']);
-                        $shortAbstract = implode(' ', array_slice($abstractWords, 0, 20)) . (count($abstractWords) > 20 ? '...' : '');
-                        echo Html::encode($shortAbstract); 
-                        ?>
-                    </p>
-                    <p><strong>Published Date:</strong> <?= Html::encode($paper['published']) ?></p>
-                    <p><strong>Authors:</strong> <?= Html::encode($paper['authors']) ?></p>
-                    <p><strong>URL:</strong> <a href="<?= Html::encode($paper['url']) ?>" target="_blank"><?= Html::encode($paper['url']) ?></a></p>
+                    <div class="scrollable-content">
+                        <p><strong>标题:</strong> <?= Html::encode($paper['title']) ?></p>
+                        <p><strong>摘要:</strong> 
+                            <?php 
+                            $abstractWords = explode(' ', $paper['abstract']);
+                            $shortAbstract = implode(' ', array_slice($abstractWords, 0, 20)) . (count($abstractWords) > 20 ? '...' : '');
+                            echo Html::encode($shortAbstract); 
+                            ?>
+                        </p>
+                        <p><strong>发表时间:</strong> <?= Html::encode($paper['published']) ?></p>
+                        <p><strong>作者:</strong> <?= Html::encode($paper['authors']) ?></p>
+                        <p><strong>URL:</strong> <a href="<?= Html::encode($paper['url']) ?>" target="_blank"><?= Html::encode($paper['url']) ?></a></p>
+                    </div>
                     <p>
-                        <a class="btn btn-default" href="<?= Url::to(['site/comment', 'paper_id' => $paper['id']]) ?>">Comments & Like</a>
+                        <a class="btn btn-default" href="<?= Url::to(['site/comment', 'paper_id' => $paper['id']]) ?>">Interactions</a>
                     </p>
                 </div>
             </div>
@@ -78,8 +88,21 @@ $this->registerCss('
         width: 300px;
         display: inline-block;
     }
+    .row {
+        margin-top: 20px;
+        display: flex;
+        flex-wrap: wrap; /* 允许多行 */
+        justify-content: space-between; /* 均匀分布 */
+    }
+    .col-lg-4 {
+        flex: 0 0 30%; /* 每行固定放三个卡片 */
+        max-width: 30%; /* 每列最大宽度为30% */
+        box-sizing: border-box; /* 包含边框和内边距 */
+        padding: 10px; /* 卡片之间留出空隙 */
+    }
     .paper-box {
-        height: 450px; /* 统一高度 */
+        width: 100%; /* 占满列宽 */
+        height: 400px; /* 固定高度 */
         padding: 15px;
         border: 1px solid #ddd;
         border-radius: 5px;
@@ -89,13 +112,16 @@ $this->registerCss('
         flex-direction: column;
         justify-content: space-between;
         box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* 添加阴影美化 */
+        overflow: hidden; /* 隐藏溢出的内容 */
+    }
+    .paper-box .scrollable-content {
+        flex: 1; /* 自动填充剩余空间 */
+        overflow-y: auto; /* 垂直方向滚动 */
+        overflow-x: hidden; /* 禁止水平方向滚动 */
+        max-height: 320px; /* 滚动内容区域的高度 */
     }
     .paper-box p {
         margin: 5px 0;
-        flex: 1; /* 自动填充空间 */
-    }
-    .row {
-        margin-top: 20px;
     }
 ');
 ?>

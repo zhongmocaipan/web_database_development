@@ -1,5 +1,9 @@
 <?php
-
+/**
+ * Team:LOVEYII,NKU
+ * coding by 胡雨欣 2212117 ,刘芳宜 2213925,20241218
+ * This is the main layout of frontend web.
+ */
 /* @var $this yii\web\View */
 /* @var $name string */
 /* @var $message string */

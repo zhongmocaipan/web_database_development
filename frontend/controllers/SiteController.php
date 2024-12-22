@@ -348,8 +348,30 @@ class SiteController extends Controller
      */
     public function actionAbout()
     {
-        return $this->render('about');  // 渲染about页面
+        // 查询所有团队成员数据
+        $members = Yii::$app->db->createCommand('SELECT * FROM members')->queryAll();
+    
+        // 将每个成员转换为对象
+        foreach ($members as &$member) {
+            $member = (object) $member;
+        }
+    
+        // 查询leader的具体数据
+        $leader = Yii::$app->db->createCommand('SELECT * FROM members WHERE zuzhangorduiyuan = :role')
+                                ->bindValue(':role', 'Leader')
+                                ->queryOne();
+    
+        // 将leader转换为对象
+        if ($leader) {
+            $leader = (object) $leader;
+        }
+    
+        return $this->render('about', [
+            'members' => $members,
+            'leader' => $leader,  // 将leader数据传递到视图
+        ]);
     }
+    
 
     /**
      * Signs user up.
@@ -695,30 +717,48 @@ class SiteController extends Controller
     public function actionArxiv()
     {
         // 获取数据库连接
-        $connection = Yii::$app->db;
+    $connection = Yii::$app->db;
 
-        // 获取用户输入的日期
-        $searchDate = Yii::$app->request->get('date', '');
+    // 获取用户输入的起始时间和结束时间
+    $startDate = Yii::$app->request->get('start_date', '');
+    $endDate = Yii::$app->request->get('end_date', '');
 
-        // 根据日期查询 arxiv_papers 表
-        if ($searchDate) {
-            $arxivPapers = $connection->createCommand('SELECT * FROM arxiv_papers WHERE published = :date')
-                ->bindValue(':date', $searchDate)
-                ->queryAll();
-        } else {
-            $arxivPapers = $connection->createCommand('SELECT * FROM arxiv_papers')->queryAll();
-        }
+    // 初始化查询条件
+    $conditions = [];
+    $params = [];
 
-        // 如果没有找到数据，抛出 404 错误
-        if (empty($arxivPapers)) {
-            throw new \yii\web\HttpException(404, 'No papers found for the selected date.');
-        }
+    // 如果用户输入了起始时间，添加到查询条件中
+    if ($startDate) {
+        $conditions[] = 'published >= :start_date';
+        $params[':start_date'] = $startDate;
+    }
 
-        // 渲染视图
-        return $this->render('arxiv', [
-            'arxivPapers' => $arxivPapers,
-            'searchDate' => $searchDate,
-        ]);
+    // 如果用户输入了结束时间，添加到查询条件中
+    if ($endDate) {
+        $conditions[] = 'published <= :end_date';
+        $params[':end_date'] = $endDate;
+    }
+
+    // 构建 SQL 查询
+    $query = 'SELECT * FROM arxiv_papers';
+    if (!empty($conditions)) {
+        $query .= ' WHERE ' . implode(' AND ', $conditions);
+    }
+
+    // 执行查询
+    $arxivPapers = $connection->createCommand($query, $params)->queryAll();
+
+    // 如果没有找到数据，抛出 404 错误
+    if (empty($arxivPapers)) {
+        throw new \yii\web\HttpException(404, 'No papers found for the selected date range.');
+    }
+
+    // 渲染视图
+    return $this->render('arxiv', [
+        'arxivPapers' => $arxivPapers,
+        'startDate' => $startDate,
+        'endDate' => $endDate,
+    ]);
     }
     // public function actionAiTool()
     // {
@@ -738,123 +778,248 @@ class SiteController extends Controller
     //         'tools' => $tools,
     //     ]);
     // }
-
     public function actionAiTool()
     {
         // 获取数据库连接
         $connection = Yii::$app->db;
     
-        // 获取用户选择的工具状态
+        // 获取筛选条件，默认空字符串
         $toolStatus = Yii::$app->request->get('tool_status', '');
+        $useableFor = Yii::$app->request->get('useableFor', ''); // 修改为与前端一致的变量名
     
-        // 查询数据库
-        $query = "SELECT * FROM all_ai_tool";
+        // SQL 查询
+        $query = "SELECT * FROM `all_ai_tool`";
         $params = [];
     
-        if ($toolStatus) {
+        // 如果用户选择了筛选条件
+        if (!empty($toolStatus)) {
             $query .= " WHERE `Free/Paid/Other` = :tool_status";
-            $params[':tool_status'] = $toolStatus;
+            $params[':tool_status'] = $toolStatus; // 绑定字符串参数
         }
     
-        try {
-            $tools = $connection->createCommand($query, $params)->queryAll();
-    
-            if (empty($tools)) {
-                throw new \yii\web\HttpException(404, 'No tools found for the selected status.');
+        // 如果用户输入了适用领域
+        if (!empty($useableFor)) {
+            if (!empty($toolStatus)) {
+                $query .= " AND `Useable For` LIKE :useableFor"; // 如果已有筛选条件，使用 AND 连接
+            } else {
+                $query .= " WHERE `Useable For` LIKE :useableFor"; // 如果没有筛选条件，直接使用 WHERE
             }
-    
-            return $this->render('ai-tool', [
-                'tools' => $tools,
-            ]);
-        } catch (\Exception $e) {
-            throw new \yii\web\HttpException(500, 'An internal error occurred.');
+            $params[':useableFor'] = '%' . $useableFor . '%'; // 绑定适用领域参数，使用 LIKE 进行模糊匹配
         }
+    
+        // 执行查询
+        $tools = $connection->createCommand($query, $params)->queryAll();
+    
+        // 判断查询结果是否为空
+        if (empty($tools)) {
+            // 如果没有符合条件的工具，显示提示信息
+            Yii::$app->session->setFlash('warning', '没有找到符合条件的工具。');
+        }
+    
+        // 渲染视图
+        return $this->render('ai-tool', [
+            'tools' => $tools,
+            'toolStatus' => $toolStatus, // 回显筛选条件
+            'useableFor' => $useableFor, // 回显适用领域
+        ]);
     }
     
+            
     
     
     public function actionLike()
     {
         if (Yii::$app->user->isGuest) {
-            Yii::$app->session->setFlash('error', 'You must be logged in to post a comment.');
+            Yii::$app->session->setFlash('error', 'You must be logged in to like a tool.');
             return $this->redirect(['site/login']);
         }
-        
+    
         $userId = Yii::$app->user->id;  // 获取当前用户 ID
         $toolName = Yii::$app->request->post('tool_name');  // 获取工具名称
-
+    
         if (!$userId || !$toolName) {
             return $this->asJson(['success' => false, 'message' => 'User ID or Tool Name is missing.']);
         }
-
-        
-
+    
+        // 检查用户是否已经对该工具点过赞
+        $existingLike = Yii::$app->db->createCommand('SELECT * FROM tool_likes WHERE user_id = :user_id AND tool_name = :tool_name')
+            ->bindValues([':user_id' => $userId, ':tool_name' => $toolName])
+            ->queryOne();
+    
         try {
-            // 插入点赞记录到数据库
-            Yii::$app->db->createCommand()->insert('tool_likes', [
-                'user_id' => $userId,
-                'tool_name' => $toolName,
-                'created_at' => time(),  // 当前时间
-            ])->execute();
-
+            if ($existingLike) {
+                // 如果已经点过赞，则取消点赞
+                Yii::$app->db->createCommand()->delete('tool_likes', ['user_id' => $userId, 'tool_name' => $toolName])->execute();
+                $message = 'Like removed.';
+            } else {
+                // 如果没有点过赞，则进行点赞
+                Yii::$app->db->createCommand()->insert('tool_likes', [
+                    'user_id' => $userId,
+                    'tool_name' => $toolName,
+                    'created_at' => time(),  // 当前时间
+                ])->execute();
+                $message = 'Like added.';
+            }
+    
             // 获取更新后的点赞数
             $likesCount = Yii::$app->db->createCommand('SELECT COUNT(*) FROM tool_likes WHERE tool_name = :tool_name', [':tool_name' => $toolName])->queryScalar();
-
-            // 返回点赞数
+    
+            // 返回点赞数和消息
             return $this->asJson([
                 'success' => true,
                 'likes_count' => $likesCount,  // 返回更新后的点赞数
+                'message' => $message,
             ]);
         } catch (\Exception $e) {
-            return $this->asJson(['success' => false, 'message' => 'You have liked this tool!']);
+            return $this->asJson(['success' => false, 'message' => 'An error occurred while processing your request.']);
         }
     }
 
     public function actionLikePaper()
     {
         
-
         if (Yii::$app->user->isGuest) {
-            Yii::$app->session->setFlash('error', 'You must be logged in to post a comment.');
+            Yii::$app->session->setFlash('error', 'You must be logged in to like a paper.');
             return $this->redirect(['site/login']);
         }
-
+    
         $userId = Yii::$app->user->id;  // 获取当前用户 ID
         $paperId = Yii::$app->request->post('paper_id');  // 获取论文 ID
-
+    
         // 检查用户ID和论文ID是否有效
         if (!$userId || !$paperId) {
             return $this->asJson(['success' => false, 'message' => 'User ID or Paper ID is missing.']);
         }
-
+    
+        // 检查用户是否已经对该论文点过赞
+        $existingLike = Yii::$app->db->createCommand('SELECT * FROM paper_likes WHERE user_id = :user_id AND paper_id = :paper_id')
+            ->bindValues([':user_id' => $userId, ':paper_id' => $paperId])
+            ->queryOne();
+    
         try {
-            // 插入点赞记录到数据库
-            Yii::$app->db->createCommand()->insert('paper_likes', [
+            if ($existingLike) {
+                // 如果已经点过赞，则取消点赞
+                Yii::$app->db->createCommand()->delete('paper_likes', ['user_id' => $userId, 'paper_id' => $paperId])->execute();
+                $message = 'Like removed.';
+            } else {
+                // 如果没有点过赞，则进行点赞
+                Yii::$app->db->createCommand()->insert('paper_likes', [
+                    'user_id' => $userId,
+                    'paper_id' => $paperId,
+                    'created_at' => new \yii\db\Expression('NOW()'),  // 当前时间
+                ])->execute();
+                $message = 'Like added.';
+            }
+    
+            // 获取更新后的点赞数
+            $likesCount = Yii::$app->db->createCommand('SELECT COUNT(*) FROM paper_likes WHERE paper_id = :paper_id', [':paper_id' => $paperId])->queryScalar();
+    
+            // 返回点赞数和消息
+            return $this->asJson([
+                'success' => true,
+                'likes_count' => $likesCount,  // 返回更新后的点赞数
+                'message' => $message,
+            ]);
+        } catch (\Exception $e) {
+            return $this->asJson(['success' => false, 'message' => 'An error occurred while processing your request.']);
+        }
+    }
+    public function actionDislike()
+{
+    if (Yii::$app->user->isGuest) {
+        Yii::$app->session->setFlash('error', 'You must be logged in to dislike a tool.');
+        return $this->redirect(['site/login']);
+    }
+
+    $userId = Yii::$app->user->id;  // 获取当前用户 ID
+    $toolName = Yii::$app->request->post('tool_name');  // 获取工具名称
+
+    if (!$userId || !$toolName) {
+        return $this->asJson(['success' => false, 'message' => 'User ID or Tool Name is missing.']);
+    }
+
+    // 检查用户是否已经对该工具点过踩
+    $existingDislike = Yii::$app->db->createCommand('SELECT * FROM tool_dislikes WHERE user_id = :user_id AND tool_name = :tool_name')
+        ->bindValues([':user_id' => $userId, ':tool_name' => $toolName])
+        ->queryOne();
+
+    try {
+        if ($existingDislike) {
+            // 如果已经点过踩，则取消点踩
+            Yii::$app->db->createCommand()->delete('tool_dislikes', ['user_id' => $userId, 'tool_name' => $toolName])->execute();
+            $message = 'Dislike removed.';
+        } else {
+            // 如果没有点过踩，则进行点踩
+            Yii::$app->db->createCommand()->insert('tool_dislikes', [
+                'user_id' => $userId,
+                'tool_name' => $toolName,
+                'created_at' => time(),  // 当前时间
+            ])->execute();
+            $message = 'Dislike added.';
+        }
+
+        // 获取更新后的点踩数
+        $dislikesCount = Yii::$app->db->createCommand('SELECT COUNT(*) FROM tool_dislikes WHERE tool_name = :tool_name', [':tool_name' => $toolName])->queryScalar();
+
+        // 返回点踩数和消息
+        return $this->asJson([
+            'success' => true,
+            'dislikes_count' => $dislikesCount,  // 返回更新后的点踩数
+            'message' => $message,
+        ]);
+    } catch (\Exception $e) {
+        return $this->asJson(['success' => false, 'message' => 'An error occurred while processing your request.']);
+    }
+}
+
+public function actionDislikePaper()
+{
+    if (Yii::$app->user->isGuest) {
+        Yii::$app->session->setFlash('error', 'You must be logged in to dislike a paper.');
+        return $this->redirect(['site/login']);
+    }
+
+    $userId = Yii::$app->user->id;  // 获取当前用户 ID
+    $paperId = Yii::$app->request->post('paper_id');  // 获取论文 ID
+
+    // 检查用户ID和论文ID是否有效
+    if (!$userId || !$paperId) {
+        return $this->asJson(['success' => false, 'message' => 'User ID or Paper ID is missing.']);
+    }
+
+    // 检查用户是否已经对该论文点过踩
+    $existingDislike = Yii::$app->db->createCommand('SELECT * FROM paper_dislikes WHERE user_id = :user_id AND paper_id = :paper_id')
+        ->bindValues([':user_id' => $userId, ':paper_id' => $paperId])
+        ->queryOne();
+
+    try {
+        if ($existingDislike) {
+            // 如果已经点过踩，则取消点踩
+            Yii::$app->db->createCommand()->delete('paper_dislikes', ['user_id' => $userId, 'paper_id' => $paperId])->execute();
+            $message = 'Dislike removed.';
+        } else {
+            // 如果没有点过踩，则进行点踩
+            Yii::$app->db->createCommand()->insert('paper_dislikes', [
                 'user_id' => $userId,
                 'paper_id' => $paperId,
                 'created_at' => new \yii\db\Expression('NOW()'),  // 当前时间
             ])->execute();
-            
-            Yii::info("Inserted like record for Paper ID: $paperId, User ID: $userId", __METHOD__);
-
-            // 获取更新后的点赞数
-            $likesCount = Yii::$app->db->createCommand('SELECT COUNT(*) FROM paper_likes WHERE paper_id = :paper_id', [':paper_id' => $paperId])->queryScalar();
-
-            Yii::info("Likes count for Paper ID: $paperId updated to: $likesCount", __METHOD__);
-
-            // 获取更新后的点赞数
-            //$likesCount = Yii::$app->db->createCommand('SELECT COUNT(*) FROM paper_likes WHERE paper_id = :paper_id', [':paper_id' => $paperId])->queryScalar();
-
-            // 返回点赞数
-            return $this->asJson([
-                'success' => true,
-                'likes_count' => $likesCount,  // 返回更新后的点赞数
-            ]);
-        } catch (\Exception $e) {
-            Yii::error("Error occurred while liking paper $paperId: " . $e->getMessage(), __METHOD__);
-            return $this->asJson(['success' => false, 'message' => 'You have liked this paper!']);
+            $message = 'Dislike added.';
         }
+
+        // 获取更新后的点踩数
+        $dislikesCount = Yii::$app->db->createCommand('SELECT COUNT(*) FROM paper_dislikes WHERE paper_id = :paper_id', [':paper_id' => $paperId])->queryScalar();
+
+        // 返回点踩数和消息
+        return $this->asJson([
+            'success' => true,
+            'dislikes_count' => $dislikesCount,  // 返回更新后的点踩数
+            'message' => $message,
+        ]);
+    } catch (\Exception $e) {
+        return $this->asJson(['success' => false, 'message' => 'An error occurred while processing your request.']);
     }
+}
     public function actionVideos()
    {
      // 禁用 main.php 布局

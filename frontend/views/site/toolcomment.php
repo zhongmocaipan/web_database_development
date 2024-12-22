@@ -1,4 +1,9 @@
 <?php
+/**
+ * Team:LOVEYII,NKU
+ * coding by 刘芳宜 2213925,20241218 庞艾语 2211581
+ * This is the main layout of frontend web.
+ */
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use yii\helpers\ArrayHelper;
@@ -37,9 +42,32 @@ $this->registerCss('
     #like-button:active {
         transform: scale(0.98);  /* 鼠标按下时，按钮稍微缩小 */
     }
+
+    #dislike-button {
+        background-color: #add8e6; /* 初始背景色：浅蓝色 */
+        border: none;  /* 去除边框 */
+        color: white;  /* 设置字体颜色为白色 */
+        padding: 10px 20px;  /* 增加内边距 */
+        font-size: 16px;  /* 设置字体大小 */
+        cursor: pointer;  /* 鼠标悬停时显示手形光标 */
+        border-radius: 25px;  /* 设置圆角效果 */
+        transition: all 0.3s ease;  /* 设置平滑过渡效果 */
+        outline: none;  /* 去除点击后的边框 */
+    }
+
+    #dislike-button.disliked {
+        background-color: #6495ed !important; /* 点踩后的背景色：蓝色 */
+    }
+
+    #dislike-button:hover {
+        transform: scale(1.05);  /* 鼠标悬停时，按钮稍微变大 */
+    }
+
+    #dislike-button:active {
+        transform: scale(0.98);  /* 鼠标按下时，按钮稍微缩小 */
+    }
 ');
 ?>
-
 
 <h1>Tool Details</h1>
 <!-- 展示工具详情 -->
@@ -54,7 +82,6 @@ $this->registerCss('
 
 <hr>
 
-
 <h2>Like this tool</h2>
 <?php
 // 获取当前工具名称
@@ -62,12 +89,18 @@ $toolName = $tool['AI Tool Name'];
 
 // 获取点赞数
 $likesCount = Yii::$app->db->createCommand('SELECT COUNT(*) FROM tool_likes WHERE tool_name = :tool_name', [':tool_name' => $toolName])->queryScalar();
+
+// 获取点踩数
+$dislikesCount = Yii::$app->db->createCommand('SELECT COUNT(*) FROM tool_dislikes WHERE tool_name = :tool_name', [':tool_name' => $toolName])->queryScalar();
 ?>
 
 <p><strong>Likes:</strong> <span id="like-count"><?= $likesCount ?></span></p>
+<p><strong>Dislikes:</strong> <span id="dislike-count"><?= $dislikesCount ?></span></p>
 
 <!-- 点赞按钮 -->
 <button id="like-button" class="btn btn-success">Like</button>
+<!-- 点踩按钮 -->
+<button id="dislike-button" class="btn btn-danger">Dislike</button>
 <hr>
 
 <h2>Comments</h2>
@@ -79,7 +112,6 @@ $likesCount = Yii::$app->db->createCommand('SELECT COUNT(*) FROM tool_likes WHER
             <p><strong>Comment:</strong> <?= Html::encode($comment->content) ?></p>
             <p><strong>Posted at:</strong> <?= date('Y-m-d H:i:s', $comment->created_at) ?></p>
         </div>
-        
     <?php endforeach; ?>
 <?php else: ?>
     <p>No comments yet.</p>
@@ -108,12 +140,6 @@ $likesCount = Yii::$app->db->createCommand('SELECT COUNT(*) FROM tool_likes WHER
 </div>
 
 <?php ActiveForm::end(); ?>
-
-
-
-
-
-
 
 <!-- 弹窗反馈 -->
 <div id="successDialog" title="Success" style="display:none;">
@@ -157,94 +183,71 @@ $script = <<<JS
     });
 
     $(document).ready(function(){
-    // 点赞操作
-    $('#like-button').on('click', function() {
-        var toolName = '$toolName';  // 获取当前工具名称
-        
-     
-        
-        // 发送点赞请求到后端
-        $.ajax({
-            url: '/site/like',  // 后端点赞接口
-            type: 'POST',
-            data: { tool_name: toolName },
-            success: function(response) {
-                if (response.success) {
-                    alert('Thank for your like!');
-                    // 更新点赞数
-                    $('#like-count').text(response.likes_count);
-                    // 切换按钮颜色
-                    $('#like-button').addClass('like');
-                } else {
-                    alert(response.message);  // 点赞失败的提示
+        // 点赞操作
+        $('#like-button').on('click', function() {
+            var toolName = '$toolName';  // 获取当前工具名称
+            var isLiked = $(this).hasClass('liked');  // 检查是否已经点赞
+            
+            // 发送点赞请求到后端
+            $.ajax({
+                url: '/site/like',  // 后端点赞接口
+                type: 'POST',
+                data: { tool_name: toolName, is_liked: isLiked },
+                success: function(response) {
+                    if (response.success) {
+                        if (response.message === 'Like added.') {
+                            alert('Thank you for your like!');  // 显示点赞成功的提示
+                            $('#like-button').addClass('liked');  // 添加点赞状态
+                        } else if (response.message === 'Like removed.') {
+                            alert('The like has been canceled.');  // 显示取消点赞的提示
+                            $('#like-button').removeClass('liked');  // 取消点赞状态
+                        }
+                        // 更新点赞数
+                        $('#like-count').text(response.likes_count);
+                    } else {
+                        alert(response.message);  // 点赞失败的提示
+                    }
+                },
+                error: function() {
+                    alert('Error occurred while liking the tool.');
                 }
-            },
-            error: function() {
-                alert('Error occurred while liking the tool.');
-            }
+            });
+        });
+
+        // 点踩操作
+        $('#dislike-button').on('click', function() {
+            var toolName = '$toolName';  // 获取当前工具名称
+            var isDisliked = $(this).hasClass('disliked');  // 检查是否已经点踩
+            
+            // 发送点踩请求到后端
+            $.ajax({
+                url: '/site/dislike',  // 后端点踩接口
+                type: 'POST',
+                data: { tool_name: toolName, is_disliked: isDisliked },
+                success: function(response) {
+                    if (response.success) {
+                        if (response.message === 'Dislike added.') {
+                            alert('You have disliked this tool.');  // 显示点踩成功的提示
+                            $('#dislike-button').addClass('disliked');  // 添加点踩状态
+                        } else if (response.message === 'Dislike removed.') {
+                            alert('The dislike has been canceled.');  // 显示取消点踩的提示
+                            $('#dislike-button').removeClass('disliked');  // 取消点踩状态
+                        }
+                        // 更新点踩数
+                        $('#dislike-count').text(response.dislikes_count);
+                    } else {
+                        alert(response.message);  // 点踩失败的提示
+                    }
+                },
+                error: function() {
+                    alert('Error occurred while disliking the tool.');
+                }
+            });
         });
     });
-});
-
-       
 JS;
 $this->registerJs($script);
 ?>
-
-<?php
-$this->registerCss('
-    .ui-dialog-titlebar-close {
-        background-color: transparent !important; /* 背景透明 */
-        color: transparent !important;                  /* 设置关闭按钮字体颜色 */
-        border: none !important; 
-    }
-
-    /* 弹窗背景、阴影和圆角 */
-    .ui-dialog.ui-widget-content {
-        background-color: white !important;  /* 背景色为白色 */
-        border-radius: 15px !important;  /* 增加圆角 */
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important; /* 细腻的阴影效果 */
-        padding: none !important;  /* 内边距增大，防止内容紧贴边框 */
-        border: none !important;  /* 去掉边框 */
-    }
-
-    /* 弹窗标题栏背景和文本样式 */
-    .ui-dialog-titlebar {
-        background: linear-gradient(145deg, #81c7e0, #5fa8d3) !important;  /* 淡蓝色渐变背景 */
-        color: white !important;  /* 文字颜色 */
-        font-size: 20px !important;  /* 字体大小 */
-        font-weight: bold !important;  /* 加粗 */
-        text-align: center !important;  /* 标题居中 */
-        padding: no !important;  /* 增加标题栏的内边距 */
-        border-top-left-radius: 12px !important;  /* 顶部左边圆角 */
-        border-top-right-radius: 12px !important;  /* 顶部右边圆角 */
-        border: none !important;  /* 去掉默认的边框 */
-    }
-     
-
-    /* 弹窗按钮样式 */
-    .ui-dialog-buttonpane button {
-        background: linear-gradient(145deg, #81c7e0, #5fa8d3) !important;  /* 按钮渐变背景 */
-        color: white !important;  /* 按钮文字颜色 */
-        border: none !important;  /* 去掉边框 */
-        padding: 10px 20px !important;  /* 按钮内边距 */
-        font-size: 16px !important;  /* 字体大小 */
-        border-radius: 8px !important;  /* 圆角按钮 */
-        cursor: pointer !important;  /* 鼠标悬停为手型 */
-        transition: background-color 0.3s ease, transform 0.2s ease !important;  /* 平滑过渡效果 */
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15) !important;  /* 添加阴影 */
-    }
-
-    /* 按钮悬浮效果 */
-    .ui-dialog-buttonpane button:hover {
-        background: linear-gradient(145deg, #5fa8d3, #81c7e0) !important;  /* 悬浮时背景颜色反转 */
-        transform: translateY(-2px) !important;  /* 按钮悬浮时上移 */
-        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2) !important;  /* 悬浮时增加阴影 */
-    }
-');
-?> 
-
-
 
 <?php
 $this->registerCss('
@@ -266,7 +269,7 @@ $this->registerCss('
         border-radius: 5px;                           /* 圆角 */
     }
 
-   #like-button {
+    #like-button {
         background-color: transparent; /* 设置按钮背景为透明 */
         border: 2px solid white;  /* 设置白色边框 */
         padding: 10px 20px;  /* 增加内边距 */
